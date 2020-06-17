@@ -1,0 +1,89 @@
+﻿@using App.Web.Utilities.Settings
+@inherits FormFieldRazorPage<decimal?, CurrencyFieldSetting>
+@{
+    var random = Randomer.Self;
+    var stg = FormFieldSetting;
+    var inputId = $"field-input-{random.Next()}";
+    var valMsg = Html.ValidationMessage(stg.InputName);
+    var hasError = valMsg != null && valMsg.ToString().StripHtmlTags().Trim().Length > 0;
+    var stringVal = Model.HasValue ? Model.Value.ToString() : "";
+    System.Globalization.CultureInfo idID = new System.Globalization.CultureInfo("id-ID");
+    var result = String.Format(idID, "{0:n0}", Model.Value);
+    var origResult = decimal.Parse(result, idID);
+    var dispVal = result;
+    //stringVal = origResult.ToString();
+}
+<div class="form-group  m-form__group  @(hasError ? "has-danger" : "") @stg.CssClass" id="@stg.HtmlId">
+    @if (!string.IsNullOrWhiteSpace(stg.Label)) {
+        if (stg.Label.Contains("</label>")) {
+
+            @Html.Raw(stg.Label)
+        } else {
+            <label for="@inputId">
+                @Html.Raw(stg.Label)
+            </label>
+
+        }
+    }
+    <div class="input-group" id="@inputId-box">
+        @if (!string.IsNullOrEmpty(stg.LeftAddon?.ToString())) {
+            <div class="input-group-prepend">
+                <span class="input-group-text">@stg.LeftAddon</span>
+            </div>
+        }
+        @{bool isDecimalPlacesExists = (Model % 1) > 0; }
+        <input type="hidden" id="@inputId" class="form-control m-input" step="1" @(stg.Disabled ? "readonly" : "")
+               placeholder="@stg.Placeholder"
+               @(stg.Changed ? "data-changed='changed'" : "")
+               name="@stg.InputName" value="@(Model == null ? Model : isDecimalPlacesExists? Model: Convert.ToUInt64(Model))" />
+        <input type="text" value="@Html.Raw(dispVal)" name="" />
+
+        @stg.RightAddon
+
+        @if (!string.IsNullOrEmpty(stg.RightAddon?.ToString())) {
+            <div class="input-group-append">
+                <span class="input-group-text">@stg.RightAddon</span>
+            </div>
+        }
+
+    </div>
+
+    @if (hasError) {
+        <div class="form-control-feedback">
+            @valMsg
+        </div>
+    }
+    <span class="m-form__help">
+        @Html.Raw(stg.HelpText)
+    </span>
+</div>
+
+@using (Html.Section("scripts"))
+{
+
+    
+<script>
+            $(document).on('change', '@inputId-box input[type="text"]', function () {
+                var value = $(this).val();
+                console.log('uyuy')
+                if ($('@inputId-box input[type="hidden"]').data('changed') !== 'changed') {
+                    $('#@(inputId)-box input[type="text"]').val(value).trigger('change');
+                    $('#@(inputId)-box input[type="hidden"]').val(value).trigger('change');
+                }
+            })
+
+</script>
+
+
+    if (stg.ChangedWatch)
+    {
+        <script>
+
+                $(document).on('keyup', '#@inputId', function () {
+                    
+                    $(this).attr('data-changed', 'changed');
+                });
+
+        </script>
+    }
+}

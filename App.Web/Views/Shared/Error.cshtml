@@ -1,0 +1,14 @@
+﻿@model HandleErrorInfo
+
+@{
+    ViewBag.Title = "Error";
+}
+
+<h1 class="text-danger">Error.</h1>
+<h2 class="text-danger">An error occurred while processing your request.</h2>
+@*@try {
+
+    <h3>@(Model?.Exception != null ? new System.Diagnostics.StackTrace(Model?.Exception, true).GetFrame(0)?.GetFileName() + " " + new System.Diagnostics.StackTrace(Model?.Exception, true).GetFrame(0)?.GetFileLineNumber().ToString() : "")</h3>
+} catch (Exception exc) {
+
+}*@

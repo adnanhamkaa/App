@@ -1,0 +1,115 @@
+﻿@using App.Web.Utilities.Settings
+@inherits FormFieldRazorPage<string, SelectFieldSetting>
+@{
+    var random = Randomer.Self;
+    var stg = FormFieldSetting;
+    var inputId = $"field-input-{random.Next()}";
+    var valMsg = string.IsNullOrEmpty(stg.InputName) ? null : Html.ValidationMessage(stg.InputName);
+    var hasError = valMsg != null && valMsg.ToString().StripHtmlTags().Trim().Length > 0;
+}
+    <div class="form-group  m-form__group @(hasError ? "has-danger" : "") @stg.CssClass" id="@stg.HtmlId">
+        @if (!string.IsNullOrWhiteSpace(stg.Label))
+        {
+            if (stg.Label.Contains("</label>"))
+            {
+
+                @Html.Raw(stg.Label)
+            }
+            else
+            {
+                <label class="form-control-label" for="@inputId">
+                    @Html.Raw(stg.Label)
+                </label>
+
+            }
+        }
+        <select class="form-control @stg.CssInput" name="@stg.InputName" @(stg.Disabled ? "readonly" : "") id="@inputId">
+            @if (stg.AddEmptyOption && !stg.Disabled)
+            {
+                <option class="emptyopt" value="" @(stg.Disabled ? "disabled" : "") @(Model == null ? "selected" : "")>@(stg.EmptyOptionLabel ?? stg.Placeholder)</option>
+            }
+            @if (stg.Options != null)
+            {
+                var opts = stg.Disabled ? stg.Options.Where(t => stg.OptionValueGetter.Invoke(t) == Model).ToList() : stg.Options;
+                foreach (var opt in opts)
+                {
+                    var val = stg.OptionValueGetter.Invoke(opt);
+                    var lab = stg.OptionLabelGetter.Invoke(opt);
+                    string parent = null;
+                    if (stg.CascadeParentIdGetter != null && !string.IsNullOrEmpty(stg.CascadeFrom))
+                    {
+                        parent = stg.CascadeParentIdGetter.Invoke(opt);
+                    }
+                    <option value="@val" @(stg.Disabled ? "readonly" : "") @(Model == val ? "selected" : "") @(parent != null ? $"data-parent={parent}" : "") @(stg.Attributes != null ? Html.Raw(stg.Attributes.Invoke(opt)) : null)>@lab</option>
+                }
+            }
+            else
+            {
+                if (Model != null && stg.Select2)
+                {
+                    <option value="@Html.Encode(Model)" selected>@(Html.Encode(stg.SelectedText) ?? "")</option>
+                }
+            }
+        </select>
+
+        <div class="form-group  m-form__group has-danger">
+            <div class="form-control-feedback">
+                <span class="field-validation-error msg-null-data" data-valmsg-replace="true"></span>
+            </div>
+        </div>
+
+        @if (hasError)
+        {
+            <div class="form-control-feedback" style="width: 100%;float:left;color:#f4516c;padding-left:20%">
+                @valMsg
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(stg.HelpText))
+        {
+            <span class="m-form__help">
+                @Html.Raw(stg.HelpText)
+            </span>
+        }
+    </div>
+
+@using (Html.Section("scripts")) {
+    if (!string.IsNullOrEmpty(stg.ReferenceFrom)) {
+        <script>
+            $('@stg.ReferenceFrom select').on('change', function () {
+                if($('#@inputId').data('changed') !== 'changed')
+                    $('#@inputId').val($(this).val());
+            })
+        </script>
+    }
+
+    if (stg.ChangedWatch) {
+        <script>
+            $('#@inputId').on('change', function () {
+                $(this).attr('data-changed', 'changed');
+            });
+        </script>
+    }
+
+    if (!string.IsNullOrEmpty(stg.CascadeFrom) && !stg.Select2) {
+        <script>
+            $(document).ready(function () {
+                var value = $('#@stg.CascadeFrom select').val();
+                var currval = $('#@inputId').val();
+
+                $('#@inputId option:not([data-parent="' + value + '"]):not(.emptyopt)').hide();
+                $('#@inputId option[data-parent="' + value + '"]:not(.emptyopt)').show();
+                $('#@inputId').val('@Model').trigger('change');
+            })
+
+            $('#@stg.CascadeFrom select').on('change', function () {
+                var value = $(this).val();
+                $('#@inputId option:not([data-parent="' + value + '"]):not(.emptyopt)').hide();
+                $('#@inputId option[data-parent="' + value + '"]:not(.emptyopt)').show();
+                //console.log('#@inputId option[data-parent="' + value + '"]:not(.emptyopt)')
+                $('#@inputId').val(null).trigger('change');
+
+            })
+        </script>
+    }
+}

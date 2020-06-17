@@ -1,0 +1,190 @@
+﻿@using App.Web.Models
+@model RegisterViewModel
+@using App.Web.Models
+@using App.DataAccess.Model.Setup
+@using App.Web.Areas.MasterData.Models
+@using App.DataAccess.Identity;
+
+@{
+    ViewBag.Title = "Entry";
+}
+
+@Html.Partial("_ValidationMessage")
+
+@using (Html.Section("styles")) {
+    <style>
+        #files .row {
+            margin-top: 1rem;
+        }
+    </style>
+}
+
+@if (Model.ResetPassword) {
+
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <div class="row">
+                <div class="col-12">
+                    <h5>
+                        Silahkan buka link berikut untuk melakukan reset password
+                    </h5>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <a href="@Model.ResetLink" id="resetlink">Reset Password</a>
+                </div>
+            </div>
+            <br />
+            <a href="javascript:;" onclick="copylink()" class="btn btn-sm">Salin Link</a>
+            <span id="message"></span>
+        </div>
+    </div>
+} else {
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { id = "all", @class = "m-form", role = "form" })) {
+
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(t => t.Id)
+
+                <div class="m-form__section m-form__section--first">
+
+                    @Html.FormFieldPartial((Model.Email ?? "").ToString(), new TextFieldSetting() {
+            InputName = Html.NameFor(t => t.Email).ToString(),
+            Label = Html.LabelForRequired(e => e.Email).ToString(),
+            Placeholder = "Email",
+            CssClass = "",
+            Style = TextFieldStyle.Email
+        })
+
+                    @Html.FormFieldPartial((Model.FullName ?? "").ToString(), new TextFieldSetting() {
+            InputName = Html.NameFor(t => t.FullName).ToString(),
+            Label = Html.LabelForRequired(e => e.FullName).ToString(),
+            Placeholder = "Nama",
+            CssClass = "",
+            Style = TextFieldStyle.Simple
+        })
+
+                    @Html.FormFieldPartial((Model.Password ?? "").ToString(), new TextFieldSetting() {
+            InputName = Html.NameFor(t => t.Password).ToString(),
+            Label = Html.LabelForRequired(e => e.Password).ToString(),
+            Placeholder = "Password",
+            CssClass = "",
+            Disabled = true,
+            Style = TextFieldStyle.Simple,
+            HelpText = "Password default, Segera ganti password ini setelah login"
+        })
+                    <input type="hidden" name="@Html.NameFor(t => t.ConfirmPassword).ToString()" value="@Model.Password" />
+
+
+
+                    @Html.FormFieldPartial(Model.IsActive.ToString().ToLower(), new RadioFieldSetting() {
+            InputName = Html.NameFor(t => t.IsActive).ToString(),
+            Label = Html.LabelForRequired(e => e.IsActive).ToString(),
+            Placeholder = "Status",
+            CssClass = "",
+            Options = new List<KeyValue>() { new KeyValue("true", "Aktif"), new KeyValue("false", "Non Aktif"), },
+            OptionLabelGetter = t => t.DirectCastTo<KeyValue>().Value,
+            OptionValueGetter = t => t.DirectCastTo<KeyValue>().Key
+        })
+
+                    @*@Html.FormFieldPartial(Model.Roles?.Select(t => t.RoleId).ToList(), new ChecklistFieldSetting() {
+                            InputName = Html.NameFor(t => t.SelectedRoles).ToString(),
+                            Label = Html.LabelForRequired(e => e.SelectedRoles).ToString(),
+                            Placeholder = "Roles",
+                            CssClass = "",
+                            Options = Model.RolesOpt,
+                            OptionLabelGetter = t => t.DirectCastTo<ApplicationRole>().Name,
+                            OptionValueGetter = t => t.DirectCastTo<ApplicationRole>().Id
+                        })*@
+
+
+                    <div class="m-form__group form-group">
+                        <label class="">Roles</label>
+                        <div class="col-9">
+                            <div class="m-checkbox-list">
+                                @{ var model = Model.Roles?.Select(t => t.RoleId).ToList(); }
+                                @foreach (var cbItem in Model.RolesOpt.OrderBy(t => t.Name).ToList()) {
+                                    <label class="m-checkbox" style="float:unset !important;width:100%">
+                                        <input type="checkbox" name="@Html.NameFor(t => t.SelectedRoles).ToString()" value="@cbItem.Id" @(model != null ? model.Contains(cbItem.Id) ? "checked" : "" : "")> @cbItem.Name.Replace("_", " ").ToPascalCase()
+                                        <span></span>
+                                    </label>
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="m-portlet__foot m-portlet__foot--fit">
+                        <div class="m-form__actions m-form__actions">
+                            @if (!string.IsNullOrEmpty(Model.Id?.Trim())) {
+                                <button type="submit" name="@Html.NameFor(t => t.cmd).ToString()" value="resetpassword" class="btn btn-secondary continue">Reset Password</button>
+                            }
+                            <button type="submit" name="@Html.NameFor(t => t.cmd).ToString()" value="save" class="btn btn-primary continue">Save</button>
+                        </div>
+                    </div>
+
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@using (Html.Section("scripts")) {
+    <script>
+        function copylink() {
+            var link = $('#resetlink').attr('href');
+
+            copyToClipboard(link);
+            $('#message').html('Link tersalin');
+        }
+    </script>
+}
+
+
+@*@{
+        ViewBag.Title = "Register";
+    }
+
+    <h2>@ViewBag.Title.</h2>
+
+    @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" })) {
+        @Html.AntiForgeryToken()
+        <h4>Create a new account.</h4>
+        <hr />
+        @Html.ValidationSummary("", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.FullName, new { @class = "col-md-2 control-label" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(m => m.FullName, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
+            <div class="col-md-10">
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-2 control-label" })
+            <div class="col-md-10">
+                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" class="btn btn-default" value="Register" />
+            </div>
+        </div>
+    }
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }*@

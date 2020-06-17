@@ -1,0 +1,70 @@
+﻿@model App.Web.Areas.Samples.Model.ShowTimeViewModel
+@using App.DataAccess
+@{
+    ViewBag.Title = "Entry";
+}
+
+@Html.Partial("_ValidationMessage")
+<div class="m-portlet">
+
+    @using (Html.BeginForm("Entry", "ShowTime", new { area = "Samples" }, FormMethod.Post, new { id = "all", @class = "m-form" })) {
+        <div class="m-portlet__body">
+            <div class="m-form__section m-form__section--first" data-title="">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="@Html.NameFor(t => t.Form.Id)" value="@(Model.Form?.Id)" />
+
+                @Html.FormFieldPartial(Model.Form?.Date, new DateTimeFieldSetting() {
+                    InputName = Html.NameFor(t => t.Form.Date).ToString(),
+                    Label = Html.LabelForRequired(e => e.Form.Date).ToString(),
+                    HelpText = "",
+                    Placeholder = "Date",
+                    CssClass = "",
+                    Style = DateTimeFieldStyle.Complete
+                })
+
+                @Html.FormFieldPartial(Model.Form?.MovieId, new SelectFieldSetting() {
+                    InputName = Html.NameFor(t => t.Form.MovieId).ToString(),
+                    Label = Html.LabelForRequired(e => e.Form.MovieId).ToString(),
+                    HelpText = "",
+                    Placeholder = "Movie",
+                    CssClass = "",
+                    AddEmptyOption = true,
+                    EmptyOptionLabel = "--Pilih--",
+                    Options = Model.Movies,
+                    OptionValueGetter = t => t.DirectCastTo<Movie>().Id,
+                    OptionLabelGetter = t => t.DirectCastTo<Movie>().Name,
+                })
+
+                @Html.FormFieldPartial(Model.Form?.TheatreId, new SelectFieldSetting() {
+                    InputName = Html.NameFor(t => t.Form.TheatreId).ToString(),
+                    Label = Html.LabelForRequired(e => e.Form.TheatreId).ToString(),
+                    HelpText = "",
+                    Placeholder = "Theatres",
+                    CssClass = "",
+                    AddEmptyOption = true,
+                    EmptyOptionLabel = "--Pilih--",
+                    Options = Model.Theatres,
+                    OptionValueGetter = t => t.DirectCastTo<Theatre>().Id,
+                    OptionLabelGetter = t => t.DirectCastTo<Theatre>().Name,
+                })
+
+                @Html.FormFieldPartial(Model.Form?.Price, new DecimalFieldSetting() {
+                    InputName = Html.NameFor(t => t.Form.Price).ToString(),
+                    Label = Html.LabelForRequired(e => e.Form.Price).ToString(),
+                    HelpText = "",
+                    Placeholder = "Price"
+                })
+                
+            </div>
+
+
+        </div>
+        <div class="m-portlet__foot m-portlet__foot--fit">
+            <div class="m-form__actions m-form__actions">
+                <button type="submit" name="@Html.NameFor(t => t.Form.IsDraft).ToString()" value="true" class="btn btn-secondary">Save as Draft</button>
+                <button type="submit" name="@Html.NameFor(t => t.Form.IsDraft).ToString()" value="false" class="btn btn-primary btnsave">Save</button>
+            </div>
+        </div>
+    }
+
+</div>

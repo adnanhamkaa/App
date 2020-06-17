@@ -1,0 +1,289 @@
+@using Microsoft.AspNet.Identity
+<!-- BEGIN: Topbar -->
+
+
+<div id="m_header_topbar" class="m-topbar  m-stack m-stack--ver m-stack--general m-stack--fluid">
+    <div class="m-stack__item m-topbar__nav-wrapper">
+        <ul class="m-topbar__nav m-nav m-nav--inline">
+             @*notification*@
+            @if (Request.IsAuthenticated) {
+            <li class="m-nav__item m-topbar__notifications m-topbar__notifications--img m-dropdown m-dropdown--large m-dropdown--header-bg-fill m-dropdown--arrow m-dropdown--align-right 	m-dropdown--mobile-full-width" m-dropdown-toggle="click"
+                m-dropdown-persistent="1">
+                <a href="#" class="m-nav__link m-dropdown__toggle" id="m_topbar_notification_icon">
+                    <!-- <span class="m-nav__link-badge m-badge m-badge--dot m-badge--dot-small m-badge--danger"></span> -->
+                    <span class="m-nav__link-icon"><i class="flaticon-alarm"></i></span>
+                    <span class="m-nav__title">
+                        <span class="m-menu__link-wrap">
+                            <span class="m-menu__link-text"></span>
+                            <span class="m-menu__link-badge">
+                                <span class="m-badge m-badge--brand m-badge--wide" id="notif-count"></span>
+                            </span>
+                        </span>
+                    </span>
+                </a>
+                <div class="m-dropdown__wrapper" id="notifwrapper" style="width:45vw;">
+                    <span class="m-dropdown__arrow m-dropdown__arrow--right"></span>
+                    <div class="m-dropdown__inner">
+                        <a href="#" class="m-dropdown__toggle close text-light" style="position:relative;right:2rem;top:1rem;" id="closebtn">
+                            <span class="m-nav__link-icon"><i id="notifId" class="fa fa-times"></i></span>
+                        </a>
+                        <div class="m-dropdown__header m--align-center" style="background: url(@Url.Content("~/assets/app/media/img/misc/notification_bg.jpg")); background-size: cover;">
+
+                            <span class="m-dropdown__header-title" id="notifheader"></span>
+                            @{
+                                var userFullName = WebHelper.GetUser()?.FullName;
+                            }
+                            <span class="m-dropdown__header-subtitle">@userFullName</span>
+                        </div>
+                        <div class="m-dropdown__body">
+                            <div class="m-dropdown__content">
+                                <div class="m-scrollable" data-scrollable="true" data-height="250" data-mobile-height="200">
+                                    @*<div class="m-list-search">
+                                <div class="m-list-search__results" id="notifcontent">
+
+                                </div>
+                            </div>*@
+                                    <div class="m-list-timeline" id="notifreminderbody">
+                                        @*<div class="m-list-timeline__items" id="reminderbody">
+                                </div>*@
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:none">
+                    <div class="m-list-timeline__item" id="notifcreatedtemplate">
+                        <span class="m-list-timeline__badge m-list-timeline__badge--warning"></span>
+                        <span class="m-list-timeline__icon flaticon-alert-1 m--font-warning"></span>
+                        <span class="m-list-timeline__text"><strong style="font-weight:550;"><a class="notiflink" href=""></a></strong></span>
+                    </div>
+
+                    <div id="emptytemplate">
+                        <img src="~/assets/app/media/img/EmptyTask.png" style="height:25vh;margin:4rem 0px;" />
+                        <h5 style="margin-top:1rem">You have no task. Enjoy your day</h5>
+                    </div>
+
+                    <div class="m-list-timeline__item" id="notifdonetemplate">
+                        <span class="m-list-timeline__badge m-list-timeline__badge--success"></span>
+                        <span class="m-list-timeline__icon la la-check m--font-success"></span>
+                        <span class="m-list-timeline__text"><a class="notiflink" href=""></a></span>
+                    </div>
+
+                    <div id="notifparenttemplate" class="notifnotifparent" style="margin-bottom:1rem;">
+                        <h5 class="notifnotiftitle"></h5>
+                        <div class="m-list-timeline__items notifnotifbody" id="">
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+                                }
+            
+            <li class="m-nav__item m-topbar__user-profile m-topbar__user-profile--img  m-dropdown m-dropdown--medium m-dropdown--arrow m-dropdown--header-bg-fill m-dropdown--align-right m-dropdown--mobile-full-width m-dropdown--skin-light"
+                m-dropdown-toggle="click">
+                <a href="#" class="m-nav__link m-dropdown__toggle">
+                    <div class="m-topbar__userpic">
+                        @if (Request.IsAuthenticated) {
+                            
+                            var colors = new string[] { "257558", "875f21", "215d87" };
+                            var username = User.Identity.GetUserName();
+                            var alphabetNumber = (Math.Abs(char.ToUpper(username[0]) - 64) + Math.Abs(username.Split('@')[0].Length)) % (colors.Length-1);
+                            var colorCode = colors[alphabetNumber];
+                            
+                            <div class="m--img-rounded m--marginless" style="height:41px;width:41px;background-color:#@(colorCode);text-align:center;">
+                                <span style="line-height: 41px;font-size: 20px;vertical-align:middle;color: white;font-weight: 500;">@username.ToUpper()[0]</span>
+                            </div>
+                        } else {
+                            <div class="m--img-rounded m--marginless" style="height:41px;width:41px;background-color:#727373;text-align:center;">
+                                <span style="line-height: 41px;font-size: 20px;vertical-align:middle;color: white;font-weight: 500;"><i class="fa fa-user" style="font-size:1.8rem"></i></span>
+                            </div>
+                            @*<img src="~/assets/app/media/img/users/user4.jpg" class="m--img-rounded m--marginless" alt="" />*@
+                        }
+                    </div>
+                    <span class="m-topbar__username m--hide">Nick</span>
+                </a>
+                <div class="m-dropdown__wrapper">
+                    <span class="m-dropdown__arrow m-dropdown__arrow--right m-dropdown__arrow--adjust"></span>
+                    <div class="m-dropdown__inner">
+                        <div class="m-dropdown__header m--align-center" style="background: url(@Url.Content("~/assets/app/media/img/misc/user_profile_bg.jpg")); background-size: cover;">
+                            <div class="m-card-user m-card-user--skin-light">
+                                @if (Request.IsAuthenticated) {
+                                    <div class="m-card-user__pic">
+                                        @*<img src="~/assets/app/media/img/users/user4.jpg" class="m--img-rounded m--marginless" alt="" />*@
+                                        <div class="m--img-rounded m--marginless" style="height:70px;width:70px; background-color:#257558;text-align:center;">
+                                            <span style="line-height: 70px;font-size: 45px;color: white;font-weight: 500;">@User.Identity.GetUserName().ToUpper()[0]</span>
+                                        </div>
+                                    </div>
+                                    <div class="m-card-user__details">
+                                        <span class="m-card-user__name m--font-weight-500">@User.Identity.GetUserName()</span>
+                                        @*<a href="" class="m-card-user__email m--font-weight-300 m-link">mark.andre@gmail.com</a>*@
+                                    </div>
+                                } else {
+
+                                }
+                            </div>
+                        </div>
+                        <div class="m-dropdown__body">
+                            <div class="m-dropdown__content">
+                                <ul class="m-nav m-nav--skin-light">
+                                    <li class="m-nav__section m--hide">
+                                        <span class="m-nav__section-text">Section</span>
+                                    </li>
+
+                                    @if (Request.IsAuthenticated) {
+                                        using (Html.BeginForm("LogOff", "Account", new { area = "" }, FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" })) {
+                                            @Html.AntiForgeryToken()
+                                            <li class="m-nav__item">
+                                                <a href="javascript:document.getElementById('logoutForm').submit()" class="btn m-btn--pill    btn-secondary m-btn m-btn--custom m-btn--label-brand m-btn--bolder">Logout</a>
+                                            </li>
+                                        }
+                                    } else {
+                                        <li class="m-nav__item">
+                                            @Html.ActionLink("Log in", "Login", "Account", new { area = "" }, new { id = "loginLink", @class = "btn m-btn--pill    btn-secondary m-btn m-btn--custom m-btn--label-brand m-btn--bolder" })
+                                        </li>
+                                    }
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+
+@using (Html.Section("scripts")) {
+    if (Request.IsAuthenticated) {
+
+
+        <div style="display:none" id="notiftemplate">
+            <a href="/equity/listing" class="m-list-search__result-item created notifitem">
+                <span class="m-list-search__result-item-icon"><i class="flaticon-alert-1 m--font-warning"></i></span>
+                <span class="m-list-search__result-item-text title"></span>
+                @*<span class="m-list-search__result-item-icon"><i class="la la-check m--font-success setdone" data-skin="light" data-toggle="m-tooltip" data-placement="top" title="Set Done" onclick="setdone(this);return false"></i></span>*@
+            </a>
+
+            <a href="#" class="m-list-search__result-item done notifitem">
+                <span class="m-list-search__result-item-icon"><i class="la la-check m--font-success"></i></span>
+                <span class="m-list-search__result-item-text title"></span>
+            </a>
+        </div>
+        <script>
+            $(document).ready(function () {
+                loadNotif();
+            })
+
+            function loadNotif() {
+
+                $('#notifcontent').html('')
+                $.ajax({
+                    url: '/Notification/GetTodos',
+                    type: 'POST',
+                    success: function (result) {
+                        var newnotif = result.length > 0 && $.grep(result, function (obj) { return obj.Status == 'created' }).length;
+                        if (newnotif > 0) {
+                            //$('#notifId').removeClass('flaticon-alarm')
+                            //$('#notifId').addClass('flaticon-bell')
+
+                            $('#newnotif').css('display', '');
+
+                            $('#notifheader').html(newnotif + " Task Hari Ini");
+                            $('#notif-count').html(newnotif + " Task");
+                        }
+                        else {
+                            //$('#notifId').removeClass('flaticon-bell')
+                            //$('#notifId').addClass('flaticon-alarm')
+                            $('#notifheader').html("Tidak Ada Task Hari Ini");
+                            $('#notif-count').html("0 Task");
+                            $('#newnotif').css('display', 'none');
+
+                            //$('#notifheader').html('');
+                        }
+                        $('#notifcontent').html('')
+
+                        $.each(result, function (i, v) {
+                            var template = null;
+
+                            var parent = $('.notifnotifparent[data-type="' + v.DisplayGrouping + '"]');
+                            debugger;
+                            if (parent.length <= 0) {
+                                parent = $('#notifparenttemplate').clone();
+                                parent.attr('id', null);
+                                parent.attr('data-type', v.DisplayGrouping);
+                                parent.appendTo('#notifreminderbody');
+                                if (v.DisplayGrouping)
+                                    parent.find('.notifnotiftitle').html(v.DisplayGrouping.replace('Reminder_','').replaceAll('_', ' '));
+                                else
+                                    parent.find('.notifnotiftitle').html('-');
+
+                            }
+
+                            var parentBody = parent.find('.notifnotifbody');
+
+                            if (v.Status === 'created') {
+                                template = $('#notifcreatedtemplate').clone();
+                                template.attr('id', null);
+                                template.find('.notiflink').attr('href', v.Url);
+                                template.find('.notiflink').html(v.Keterangan);
+                                //template.find('.title').html(v.Keterangan + '<br/><i><i class="la la-clock-o" style="font-size:small;"></i> ' + moment(v.DueDate, "YYYY-MM-DDTHH:mm:ss").format("dddd, DD MMM YYYY") + "</i>");
+                                //template.find('.setdone').attr('data-id', v.Id);
+
+                                template.appendTo(parentBody);
+
+                            } else {
+                                template = $('#notifdonetemplate').clone();
+                                template.attr('id', null);
+                                template.find('.notiflink').attr('href', v.Url);
+                                template.find('.notiflink').html(v.Keterangan);
+
+                                template.appendTo(parentBody);
+
+                            }
+                        })
+
+                        //$.each(result, function (i, v) {
+                        //    var template = null;
+                        //    if (v.Status === 'created') {
+                        //        template = $('#notiftemplate a.created').clone();
+
+                        //        template.attr('href', v.Url);
+                        //        template.find('.title').html(v.Keterangan + '<br/><i><i class="la la-clock-o" style="font-size:small;"></i> ' + moment(v.DueDate, "YYYY-MM-DDTHH:mm:ss").format("dddd, DD MMM YYYY") + "</i>");
+                        //        template.find('.setdone').attr('data-id', v.Id);
+
+                        //        template.appendTo('#notifcontent')
+                        //    }
+                        //    else {
+                        //        template = $('#notiftemplate a.done').clone();
+
+                        //        template.attr('href', v.Url);
+                        //        template.find('.title').html(v.Keterangan);
+
+                        //        template.appendTo('#notifcontent')
+                        //    }
+                        //})
+                    }
+                })
+            }
+
+            function setdone(sender) {
+                var id = $(sender).data('id');
+
+                $.ajax({
+                    url: '/Notification/SetDone',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (result) {
+                        loadNotif();
+                    }
+                });
+                return false;
+
+            }
+        </script>
+    }
+}
+
+<!-- END: Topbar -->

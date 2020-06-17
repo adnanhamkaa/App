@@ -1,0 +1,368 @@
+﻿@{
+    var mvcArea = ViewContext.RouteData.DataTokens["area"] as string;
+    if (!string.IsNullOrWhiteSpace(mvcArea))
+    {
+        mvcArea = mvcArea + " | ";
+    }
+
+
+    var controllerName = this.ViewContext.RouteData.Values["controller"].ToString();
+    var areaname = ViewContext.RouteData.DataTokens["area"];
+
+}<!DOCTYPE html>
+
+<!--
+Template Name: Metronic - Responsive Admin Dashboard Template build with Twitter Bootstrap 4
+Author: KeenThemes
+Website: http://www.keenthemes.com/
+Contact: support@keenthemes.com
+Follow: www.twitter.com/keenthemes
+Dribbble: www.dribbble.com/keenthemes
+Like: www.facebook.com/keenthemes
+Purchase: http://themeforest.net/item/metronic-responsive-admin-dashboard-template/4021469?ref=keenthemes
+Renew Support: http://themeforest.net/item/metronic-responsive-admin-dashboard-template/4021469?ref=keenthemes
+License: You must have a valid license purchased only from themeforest(the above link) in order to legally use the theme for your project.
+-->
+<html lang="en">
+
+<!-- begin::Head -->
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title | @(mvcArea)IDX SPOP+</title>
+    <meta name="description" content="IDX SPOP+">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+    <link href="~/assets/vendors/base/fonts/poppins.css" rel="stylesheet" />
+    <link href="~/assets/vendors/base/fonts/roboto.css" rel="stylesheet" />
+
+    <!--begin::Web font -->
+    @*<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js"></script>*@
+    @*<script>
+            WebFont.load({
+                google: { "families": ["Poppins:300,400,500,600,700", "Roboto:300,400,500,600,700"] },
+                active: function () {
+                    sessionStorage.fonts = true;
+                }
+            });
+        </script>*@
+
+    <!--end::Web font -->
+    <!--begin::Global Theme Styles -->
+    <link href="~/assets/vendors/base/vendors.bundle.css" rel="stylesheet" type="text/css" />
+
+    <!--RTL version:<link href="~/assets/vendors/base/vendors.bundle.rtl.css" rel="stylesheet" type="text/css" />-->
+    <link href="~/assets/demo/default/base/style.bundle.css" rel="stylesheet" type="text/css" />
+
+    <!--RTL version:<link href="~/assets/demo/default/base/style.bundle.rtl.css" rel="stylesheet" type="text/css" />-->
+    <!--end::Global Theme Styles -->
+    <!--begin::Page Vendors Styles -->
+    <link rel="stylesheet" type="text/css" href="~/assets-backend/vendors/DataTables/datatables.min.css" />
+
+    @*<link href="~/assets/vendors/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" type="text/css" />*@
+    <link href="~/assets/vendors/custom/datatables/datatables.bundle.css" rel="stylesheet" />
+    <!--RTL version:<link href="~/assets/vendors/custom/fullcalendar/fullcalendar.bundle.rtl.css" rel="stylesheet" type="text/css" />-->
+    <link href="~/assets/demo/default/custom/crud/forms/widgets/bootstrap-clockpicker.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/app/css/custom.css?v=@DateTime.Now.ToString("o")" rel="stylesheet" type="text/css" />
+    <!--end::Page Vendors Styles -->
+    @*<link rel="shortcut icon" href="~/assets/demo/default/media/img/logo/favicon.ico" />*@
+    <link rel="shortcut icon" href="~/assets/app/media/img/favicon.ico" />
+    <link rel="icon" type="image/vnd.microsoft.icon" sizes="48x48" href="~/assets/app/media/img/favicon.ico">
+    <link rel="icon" type="image/vnd.microsoft.icon" sizes="96x96" href="~/assets/app/media/img/favicon.ico">
+    <link rel="icon" type="image/vnd.microsoft.icon" sizes="144x144" href="~/assets/app/media/img/favicon.ico">
+    <link rel="icon" type="image/vnd.microsoft.icon" sizes="192x192" href="~/assets/app/media/img/favicon.ico">
+    <link href="~/assets/app/style/app.css?v=@DateTime.Now.ToString("o")" rel="stylesheet" />
+    @RenderSection("styles", false)
+    @Html.RenderSection("styles")
+    <style>
+        .exportExcel {
+            background-color: #34bfa3 !important;
+            color: #fff !important;
+        }
+    </style>
+</head>
+
+<!-- end::Head -->
+<!-- begin::Body -->
+<body class="m-page--fluid m--skin- m-content--skin-light2 m-header--fixed m-header--fixed-mobile m-aside-left--enabled m-aside-left--skin-light m-aside-left--fixed m-aside-left--offcanvas m-footer--push m-aside--offcanvas-default">
+
+    <!-- begin:: Page -->
+    <div class="m-grid m-grid--hor m-grid--root m-page">
+
+        @Html.Partial("~/Views/Shared/Metronic/_Header.cshtml")
+
+        <!-- begin::Body -->
+        <div class="m-grid__item m-grid__item--fluid m-grid m-grid--ver-desktop m-grid--desktop m-body">
+
+            @Html.Partial("~/Views/Shared/Metronic/_LeftAside.cshtml")
+
+            <div class="m-grid__item m-grid__item--fluid m-wrapper">
+
+                <!-- BEGIN: Subheader -->
+                <div class="m-subheader ">
+                    <div class="d-flex align-items-center">
+                        <div class="mr-auto">
+                            <h3 class="m-subheader__title m-subheader__title--separator">@ViewBag.Title</h3>
+                            @Html.Partial("~/Views/Shared/Metronic/_Breadcrumbs.cshtml")
+                        </div>
+                    </div>
+                </div>
+                <!-- END: Subheader -->
+                <div class="m-content">
+                    @Html.Partial("_FlashMessage")
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modal_preview" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" style="max-width:75vw;" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Preview</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="previewwindow">
+                        @*<div class="m-scrollable" data-scrollbar-shown="true" data-scrollable="true" data-height="700" >
+
+                        </div>*@
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="modal_presave" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" style="max-width:75vw;" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Preview</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="presavewindow">
+                        @*<div class="m-scrollable" data-scrollbar-shown="true" data-scrollable="true" data-height="700" >
+
+                        </div>*@
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="presaveClose" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="presaveSubit" data-dismiss="modal">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="reminderModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" style="max-width:50vw;" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color:#390091">
+                        <h5 class="modal-title" id="exampleModalLabel" style="color:#fff">Task Reminder</h5>
+                        <button type="button" style="color:#fff" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="m-list-timeline" id="reminderbody">
+                            @*<div class="m-list-timeline__items" id="reminderbody">
+                            </div>*@
+                        </div>
+
+                    </div>
+                    <div class="modal-footer" style="padding: 1rem;background-color: #e6e6e6;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;">
+                        <button type="button" class="btn btn-secondary" id="presaveClose" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="display:none">
+            <div class="m-list-timeline__item" id="remindercreatedtemplate">
+                <span class="m-list-timeline__badge m-list-timeline__badge--warning"></span>
+                <span class="m-list-timeline__icon flaticon-alert-1 m--font-warning"></span>
+                <span class="m-list-timeline__text"><strong style="font-weight:550;"><a class="reminderlink" href=""></a></strong></span>
+            </div>
+
+            <div id="emptytemplate">
+                <img src="~/assets/app/media/img/EmptyTask.png" style="height:25vh;margin:4rem 0px;" />
+                <h5 style="margin-top:1rem">You have no task. Enjoy your day</h5>
+            </div>
+
+            <div class="m-list-timeline__item" id="reminderdonetemplate">
+                <span class="m-list-timeline__badge m-list-timeline__badge--success"></span>
+                <span class="m-list-timeline__icon la la-check m--font-success"></span>
+                <span class="m-list-timeline__text"><a class="reminderlink" href=""></a></span>
+            </div>
+
+            <div id="parenttemplate" class="notifparent" style="margin-bottom:1rem;">
+                <h5 class="notiftitle"></h5>
+                <div class="m-list-timeline__items notifbody" id="">
+                    
+                </div>
+            </div>
+        </div>
+
+        <!-- end:: Body -->
+        <!-- begin::Footer -->
+        <footer class="m-grid__item        m-footer ">
+            <div class="m-container m-container--fluid m-container--full-height m-page__container">
+                <div class="m-stack m-stack--flex-tablet-and-mobile m-stack--ver m-stack--desktop">
+                    <div class="m-stack__item m-stack__item--left m-stack__item--middle m-stack__item--last">
+                        <span class="m-footer__copyright">
+                            @DateTime.Now.Year &copy; <a href="https://gitlab.com/suitmedia/c-sharp-starter-pack" class="m-link">C# Starter Pack</a> @CommonHelper.GetVersion()
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <!-- end::Footer -->
+    </div>
+
+    <!-- end:: Page -->
+    @*@Html.Partial("~/Views/Shared/Metronic/_QuickSidebar.cshtml")*@
+
+    <!-- begin::Scroll Top -->
+    <div id="m_scroll_top" class="m-scroll-top">
+        <i class="la la-arrow-up"></i>
+    </div>
+
+    <!-- end::Scroll Top -->
+    @*@Html.Partial("~/Views/Shared/Metronic/_QuickNav.cshtml")*@
+
+    <!--begin::Global Theme Bundle -->
+    @Scripts.Render("~/bundles-backend/vendors/lodash", "~/bundles-backend/vendors/vue")
+    <script src="~/assets/vendors/base/vendors.bundle.js" type="text/javascript"></script>
+    <script src="~/assets/demo/default/base/scripts.bundle.js" type="text/javascript"></script>
+    <script src="~/assets/vendors/base/moment-with-locales.js"></script>
+
+    <!--end::Global Theme Bundle -->
+    <!--begin::Page Vendors -->
+    <script src="~/assets/vendors/custom/fullcalendar/fullcalendar.bundle.js" type="text/javascript"></script>
+    <script src="~/assets/vendors/custom/fullcalendar/fullcalendar.bundle.js" type="text/javascript"></script>
+    @*<script src="~/assets/demo/default/custom/crud/forms/widgets/bootstrap-datetimepicker.js"></script>*@
+    <script src="~/assets/demo/default/custom/crud/forms/widgets/bootstrap-datetimepicker.id.js"></script>
+    <script src="~/assets/demo/default/custom/crud/forms/widgets/bootstrap-clockpicker.min.js"></script>
+    <script src="~/assets/vendors/base/JQuery.cookie.js"></script>
+    <script>
+        var menuName = @Html.Raw(Json.Encode(ViewBag.Title));
+        
+    </script>
+    <script src="~/assets/app/js/my-script.js?v=@(DateTime.Now.ToString("o"))"></script>
+
+
+    <!--end::Page Vendors -->
+    <!--begin::Page Scripts -->
+    <script src="~/assets/app/js/dashboard.js" type="text/javascript"></script>
+    @*<script src="~/assets/vendors/custom/datatables/datatables.bundle.js" type="text/javascript"></script>*@
+
+    <script src="~/assets-backend/vendors/DataTables/datatables.min.js" type="text/javascript"></script>
+
+
+    @*<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/b-flash-1.5.6/b-html5-1.5.6/cr-1.5.0/fc-3.2.5/fh-3.1.4/r-2.2.2/sc-2.0.0/datatables.min.js"></script>*@
+
+
+    <!--end::Page Scripts -->
+    @RenderSection("scripts", false)
+    @Html.RenderSection("scripts")
+    <script>
+
+        window.areaName = "@areaname";
+        window.controllerName = "@controllerName";
+
+        moment.locale('id')
+
+        $('form').on('focus', 'input[type=number]', function (e) {
+            $(this).on('mousewheel.disableScroll', function (e) {
+                e.preventDefault()
+            })
+        })
+        $('form').on('blur', 'input[type=number]', function (e) {
+            $(this).off('mousewheel.disableScroll')
+        })
+    </script>
+    <script>
+        if ($('#status-filter-option').length != 0) {
+            $('#status-filter-option').select2({
+                width: '100%'
+            })
+        }
+    </script>
+
+
+    @* Dipergunakan di ~\_backend\Idx.Spop\App.Web\Views\Shared\Metronic\_FormFields\custom\_float.cshtml *@
+    <script src="~/assets/vendors/base/jquery.number.min.js"></script>
+    <script>
+        $(window).ready(
+            function () {
+                $('.separator_number').number(true);
+
+                $('.separator_number').parents('form').submit(
+                    function () {
+                        var $formatedInputFields = $(this).find('.separator_number');
+
+                        $formatedInputFields.each(
+                            function () {
+                                var $e = $(this);
+                                $e.data('raw_val', $e.val());
+                            }
+                        );
+
+                        delete $.valHooks.text.get;
+                        delete $.valHooks.text.set;
+
+                        $formatedInputFields.each(
+                            function () {
+                                var $e = $(this);
+                                $e.val($e.data('raw_val'));
+                            }
+                        );
+                    }
+                );
+            }
+        );
+    </script>
+    <script>
+        var navItems = $('.nav-item')
+        navItems.eq(0).addClass('list-active')
+        function defaultNav() {
+            for (var i = 0; i < navItems.length; i++) {
+                navItems.eq(i).removeClass('list-active') //css({ 'background-color': '#fff', "border-color": "#ebedf2" })
+                navItems.eq(i).find('a').removeClass('link-active')
+            }
+        }
+        
+        //checkNavActive(navItems.eq(0))
+        navItems.click(function () {
+            defaultNav()
+            $(this).addClass('list-active')
+            $(this).find('a').addClass('link-active')
+        })
+
+
+        $('.continue').click(function () {
+            defaultNav()
+        })
+        //navItems.find('a').hover(function () {
+        //    $(this).css({"border-color": "#ebedf2"})
+        //})
+        //function checkNavActive(elem) {
+        //    console.log(elem.find('.active').length)
+        //    if (elem.find('.active').length > 0) {
+        //        elem.css({ 'background-color': '#390091' })
+        //        elem.find('.active').css({ 'color': '#fff' })
+        //    } else {
+        //        elem.css({ 'background-color': '#fff' })
+        //        elem.find('.active').css({ 'color': '#000' })
+        //    }
+        //}
+    </script>
+    <script src="~/assets/demo/default/custom/components/base/tooltip.js"></script>
+</body>
+<!-- end::Body -->
+</html>

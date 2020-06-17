@@ -1,0 +1,46 @@
+﻿@using App.Web.Utilities.Settings
+@inherits FormFieldRazorPage<IEnumerable<string>, ChecklistFieldSetting>
+@{
+    var random = Randomer.Self;
+    var stg = FormFieldSetting;
+    var inputId = $"field-input-{random.Next()}";
+    var valMsg = string.IsNullOrEmpty(stg.InputName) ? null : Html.ValidationMessage(stg.InputName);
+    var hasError = valMsg != null && valMsg.ToString().StripHtmlTags().Trim().Length > 0;
+    string className = "";
+}
+<div class="form-group  m-form__group @(hasError ? "has-danger" : "") @stg.CssClass" id="@stg.HtmlId">
+    @if (!string.IsNullOrWhiteSpace(stg.Label)) {
+        if (stg.Label.Contains("</label>")) {
+
+            @Html.Raw(stg.Label)
+        } else {
+            <label class="form-control-label" for="@inputId">
+                @Html.Raw(stg.Label)
+            </label>
+
+        }
+    }
+    <div class="m-checkbox-inline">
+        @foreach (var opt in stg.Options ?? new List<object>()) {
+            var val = stg.OptionValueGetter.Invoke(opt);
+            var lab = stg.OptionLabelGetter.Invoke(opt);
+
+            <label class="m-checkbox @(stg.Disabled?"m-checkbox--disabled":"")">
+                @if (!string.IsNullOrEmpty(val))  { 
+                    className = val.ToLower().Replace(" ", "-");
+                }
+                <input type="checkbox" class="@className" name="@stg.InputName" @(stg.Disabled ? "readonly" : "") value="@val" @(Model != null ? Model.Contains(val) ? "checked" : "" : "")> @lab
+                <span></span>
+            </label>
+        }
+    </div>
+
+    @if (hasError) {
+        <div class="form-control-feedback" style="width: 100%;float:left;color:#f4516c;padding-left:20%">
+            @valMsg
+        </div>
+    }
+    <span class="m-form__help" style="padding-left:0px;">
+        @Html.Raw(stg.HelpText)
+    </span>
+</div>

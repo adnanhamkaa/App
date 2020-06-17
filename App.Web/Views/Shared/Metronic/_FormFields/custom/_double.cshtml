@@ -1,0 +1,108 @@
+﻿@using App.Web.Utilities.Settings
+@inherits FormFieldRazorPage<double?, DoubleFieldSetting>
+@{
+    var random = Randomer.Self;
+    var stg = FormFieldSetting;
+    var inputId = $"field-input-{random.Next()}";
+    var valMsg = string.IsNullOrEmpty(stg.InputName) ? null : Html.ValidationMessage(stg.InputName);
+    var hasError = valMsg != null && valMsg.ToString().StripHtmlTags().Trim().Length > 0;
+}
+<div class="form-group  m-form__group  @(hasError ? "has-danger" : "") @stg.CssClass" id="@stg.HtmlId">
+    @if (!string.IsNullOrWhiteSpace(stg.Label))
+    {
+        if (stg.Label.Contains("</label>"))
+        {
+
+            @Html.Raw(stg.Label)
+        }
+        else
+        {
+            <label for="@inputId">
+                @Html.Raw(stg.Label)
+            </label>
+
+        }
+    }
+    <div class="input-group">
+        @if (!string.IsNullOrEmpty(stg.LeftAddon?.ToString()))
+        {
+            <div class="input-group-prepend">
+                <span class="input-group-text">@stg.LeftAddon</span>
+            </div>
+        }
+        <input type="text" id="@inputId" class="form-control m-input numberInputMask" autocomplete="off" step="0.01" @(stg.Disabled ? "readonly" : "")
+               placeholder="@stg.Placeholder"
+               @(stg.Changed ? "data-changed='changed'" : "")
+               value="@(Model)"
+               @(stg.MaxValue != null ? "data-maxvalue=" + stg.MaxValue.ToString() + "" : "data-maxvalue=99999999999999999") />
+
+        <input type="hidden" id="@inputId-value" name="@stg.InputName" value="@(Model)" />
+        @*@stg.RightAddon*@
+
+        @if (!string.IsNullOrEmpty(stg.RightAddon?.ToString()))
+        {
+            <div class="input-group-append">
+                <span class="input-group-text">@stg.RightAddon</span>
+            </div>
+        }
+
+    </div>
+
+    @if (hasError)
+    {
+        <div class="form-control-feedback" style="width: 100%;float:left;color:#f4516c;padding-left:20%">
+            @valMsg
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(stg.HelpText))
+    {
+        <span class="m-form__help">
+            @Html.Raw(stg.HelpText)
+        </span>
+    }
+</div>
+
+@using (Html.Section("scripts"))
+{
+
+    <script>
+
+        var watch = @Html.Raw(stg.ChangedWatch.ToString().ToLower());
+
+        $(document).on('change', '#@inputId', function () {
+
+            $('#@inputId-value').val($('#@inputId').numberVal());
+            $('#@inputId-value').trigger('change');
+        })
+
+
+        $(document).ready(function () {
+            $('#@inputId').numberVal($('#@inputId').val());
+            $('#@inputId').trigger('change');
+
+            @*if (watch) {
+                $(document).on('change', '#@inputId', function () {
+
+                    $(this).attr('data-changed', 'changed');
+                });
+            }*@
+
+
+        })
+    </script>
+
+    if (!string.IsNullOrEmpty(stg.ReferenceFrom))
+    {
+        <script>
+            $(document).on('change', '@stg.ReferenceFrom input[type=text]', function () {
+                var value = $(this).val();
+                if ($('#@inputId').data('changed') !== 'changed') {
+                    $('#@inputId').val(value).trigger('change');
+                }
+            })
+        </script>
+    }
+
+
+}

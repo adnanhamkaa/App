@@ -1,0 +1,24 @@
+﻿
+@{
+    var valErrSum = Html.ValidationSummary();
+    var cleaned = Html.Encode(valErrSum.ToString());
+    var hasErr = !string.IsNullOrWhiteSpace(cleaned);
+}
+@if (hasErr) {
+    <div class="portlet solid red">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="fa fa-exclamation-triangle"></i>
+                <span class="small">
+                    Error Validasi
+                </span>
+            </div>
+        </div>
+        <div class="portlet-body">
+
+            @Html.Raw(valErrSum)
+        </div>
+    </div>
+
+
+}

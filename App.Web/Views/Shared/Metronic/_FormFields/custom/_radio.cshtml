@@ -1,0 +1,60 @@
+﻿@using App.Web.Utilities.Settings
+@inherits FormFieldRazorPage<string, RadioFieldSetting>
+@{
+    var random = Randomer.Self;
+    var stg = FormFieldSetting;
+    var inputId = $"field-input-{random.Next()}";
+    var valMsg = string.IsNullOrEmpty(stg.InputName) ? null : Html.ValidationMessage(stg.InputName);
+    var hasError = valMsg != null && valMsg.ToString().StripHtmlTags().Trim().Length > 0;
+}
+<div class="form-group  m-form__group @(hasError ? "has-danger" : "") @stg.CssClass" id="@(stg.HtmlId??inputId)">
+    @if (!string.IsNullOrWhiteSpace(stg.Label)) {
+        if (stg.Label.Contains("</label>")) {
+
+            @Html.Raw(stg.Label)
+        } else {
+            <label class="form-control-label" for="@inputId">
+                @Html.Raw(stg.Label)
+            </label>
+
+        }
+    }
+    <div class="m-radio-inline">
+        @foreach (var opt in stg.Options) {
+            var val = stg.OptionValueGetter.Invoke(opt);
+            var lab = stg.OptionLabelGetter.Invoke(opt);
+
+            <label class="m-radio @(stg.Disabled?"m-radio--disabled":"")">
+                <input type="radio" name="@stg.InputName" @(stg.Disabled ? "readonly" : "") value="@val" @(Model == val ? "checked" : "")> @lab
+                <span></span>
+            </label>
+        }
+    </div>
+
+    @if (hasError) {
+        <div class="form-control-feedback" style="width: 100%;float:left;color:#f4516c;padding-left:20%">
+            @valMsg
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(stg.HelpText)) {
+        <span class="m-form__help">
+            @Html.Raw(stg.HelpText)
+        </span>
+    }
+</div>
+
+@using (Html.Section("scripts")) {
+    if (stg.Disabled) {
+        <script>
+            $('#@(stg.HtmlId ??inputId) :radio:not(:checked)').attr('disabled', true);
+        </script>
+    }
+
+    if (!string.IsNullOrEmpty(stg.ReferenceFrom)) {
+        <script>
+            RadioListenTo('@stg.ReferenceFrom input[type="radio"]','#@(stg.HtmlId ?? inputId) input[type="radio"]')
+        </script>
+
+    }
+}

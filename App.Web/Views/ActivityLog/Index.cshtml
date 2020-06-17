@@ -1,0 +1,58 @@
+﻿
+@{
+    ViewBag.Title = "Activity Log";
+    var controllerName = this.ViewContext.RouteData.Values["controller"].ToString();
+    var areaname = ViewContext.RouteData.DataTokens["area"];
+}
+
+<div class="m-portlet m-portlet--mobile">
+    <div class="m-portlet__head">
+        <div class="m-portlet__head-caption">
+            <div class="m-portlet__head-title">
+                <h3 class="m-portlet__head-text"></h3>
+            </div>
+        </div>
+
+    </div>
+    <div class="m-portlet__body">
+
+        @Html.Partial("~/Views/Shared/Metronic/_TableToolsDynamic.cshtml")
+
+        <table class="table table-striped table-bordered table-hover table-checkable" id="users">
+            <thead>
+                <tr>
+                    @Html.RenderColumnsHtml(typeof(App.Web.Models.ActivityLogModel))
+                </tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot>
+                <tr>
+                    @Html.RenderColumnsHtml(typeof(App.Web.Models.ActivityLogModel))
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+
+
+@section scripts{
+
+    <script>
+        var dtListing = {};
+        var ds = [];
+        
+        var columns = @Html.RenderColumnsOption(typeof(App.Web.Models.ActivityLogModel));
+
+        $(document).ready(function () {
+                DatatableInit($('#users'), { columnDefs: columns, url: '/@controllerName/List', useNumberCol: true });
+        });
+
+        function deleteListing() {
+            if (!confirm("Apakah Anda yakin menghapus data ini ?")) {
+                return false;
+            }
+        }
+    </script>
+
+}

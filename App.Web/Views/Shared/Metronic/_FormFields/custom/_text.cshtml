@@ -1,0 +1,102 @@
+﻿@using App.Web.Utilities.Settings
+@inherits FormFieldRazorPage<string, TextFieldSetting>
+@{
+    var random = Randomer.Self;
+    var stg = FormFieldSetting;
+    var inputId = $"field-input-{random.Next()}";
+    var valMsg = string.IsNullOrEmpty(stg.InputName) ? null : Html.ValidationMessage(stg.InputName);
+    var hasError = valMsg != null && valMsg.ToString().StripHtmlTags().Trim().Length > 0;
+    
+
+}
+<div class="form-group m-form__group @stg.CssClass @(hasError ? "has-danger" : "")" id="@stg.HtmlId">
+    @if (!string.IsNullOrWhiteSpace(stg.Label)) {
+
+        if (stg.Label.Contains("</label>")) {
+
+            @Html.Raw(stg.Label)
+        } else {
+            <label class="form-control-label" for="@inputId">
+                @Html.Raw(stg.Label)
+            </label>
+        }
+
+    }
+    <div class="input-group">
+        @if (!string.IsNullOrEmpty(stg.LeftAddon?.ToString())) {
+            <div class="input-group-prepend">
+                <span class="input-group-text">@stg.LeftAddon</span>
+            </div>
+        }
+        @if (stg.Style == TextFieldStyle.Simple || stg.Style == TextFieldStyle.Password || stg.Style == TextFieldStyle.Email) {
+            <input type="@(stg.Style == TextFieldStyle.Password ? "password" : stg.Style == TextFieldStyle.Email? "email": "text")"
+                   id="@inputId" @(stg.Disabled ? "readonly" : "")
+                   @(stg.MaxLength != null ? Html.Raw($"maxlength=\"{stg.MaxLength}\"") : null) autocomplete="off" class="form-control m-input"
+                   placeholder="@stg.Placeholder"
+                   @(stg.Changed ? "data-changed='changed'" : "")
+                   name="@stg.InputName" value="@Html.Raw(Model)" />
+        } else {
+            <textarea id="@inputId" class="form-control m-input" autocomplete="off" @(stg.Disabled ? "readonly" : "") @(stg.MaxLength != null ? Html.Raw($"maxlength=\"{stg.MaxLength}\"") : null) name="@stg.InputName"
+                      placeholder="@stg.Placeholder" rows="5">@Html.Raw(Model)</textarea>
+            if (stg.Style == TextFieldStyle.RichText) {
+                using (Html.Section("script")) {
+                    <script type="text/javascript">
+                        $(function() {
+                            CKEDITOR.replace('@inputId');
+                        });
+                    </script>
+                }
+            }
+        }
+        @if (!string.IsNullOrEmpty(stg.RightAddon?.ToString())) {
+            <div class="input-group-append">
+                <span class="input-group-text">@stg.RightAddon</span>
+            </div>
+        }
+
+
+    </div>
+    @if (hasError) {
+        <div class="m-form__help form-control-feedback" style="width: 100%;float:left;color:#f4516c;padding-left:20%">
+            @valMsg
+        </div>
+    } else {
+
+    }
+
+    @if (!string.IsNullOrEmpty(stg.HelpText)) {
+    <span class="m-form__help">
+        @Html.Raw(stg.HelpText)
+    </span>
+    }
+
+
+</div>
+
+@using (Html.Section("scripts")) {
+
+    if (!string.IsNullOrEmpty(stg.ReferenceFrom)) {
+        <script>
+            $(document).on('change', '@stg.ReferenceFrom', function () {
+                var value = $(this).val();
+
+                if ($('#@inputId').data('changed') !== 'changed') {
+                    $('#@inputId').val(value).trigger('change');
+                }
+            })
+
+        </script>
+    }
+
+
+    if (stg.ChangedWatch) {
+        <script>
+
+                @*$(document).on('keyup', '#@inputId', function () {
+
+                    $(this).attr('data-changed', 'changed');
+                });*@
+
+        </script>
+    }
+}

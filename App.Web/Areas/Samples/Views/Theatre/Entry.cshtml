@@ -1,0 +1,45 @@
+﻿@model App.Web.Areas.Samples.Model.TheatreViewModel
+@{
+    ViewBag.Title = "Entry";
+}
+
+@Html.Partial("_ValidationMessage")
+<div class="m-portlet">
+
+    @using (Html.BeginForm("Entry", "Theatre", new { area = "Samples" }, FormMethod.Post, new { id = "all", @class = "m-form" })) {
+        <div class="m-portlet__body">
+            <div class="m-form__section m-form__section--first" data-title="">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="@Html.NameFor(t => t.Form.Id)" value="@(Model.Form?.Id)" />
+
+                @Html.FormFieldPartial((Model.Form?.Name ?? "").ToString(), new TextFieldSetting() {
+                    InputName = Html.NameFor(t => t.Form.Name).ToString(),
+                    Label = Html.LabelForRequired(e => e.Form.Name).ToString(),
+                    HelpText = "",
+                    Placeholder = "Name",
+                    CssClass = "",
+                    Style = TextFieldStyle.Simple
+                })
+
+
+                @Html.FormFieldPartial(Model.Form?.NumberOfSeat, new IntFieldSetting() {
+                    InputName = Html.NameFor(t => t.Form.NumberOfSeat).ToString(),
+                    Label = Html.LabelForRequired(e => e.Form.NumberOfSeat).ToString(),
+                    HelpText = "",
+                    Placeholder = "Number Of Seat",
+                    CssClass = ""
+                })
+
+            </div>
+
+
+        </div>
+        <div class="m-portlet__foot m-portlet__foot--fit">
+            <div class="m-form__actions m-form__actions">
+                <button type="submit" name="@Html.NameFor(t => t.Form.IsDraft).ToString()" value="true" class="btn btn-secondary">Save as Draft</button>
+                <button type="submit" name="@Html.NameFor(t => t.Form.IsDraft).ToString()" value="false" class="btn btn-primary btnsave">Save</button>
+            </div>
+        </div>
+    }
+
+</div>

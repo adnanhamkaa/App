@@ -1,0 +1,107 @@
+﻿@using App.Web.Models
+@model RoleViewModel
+@using App.Web.Models
+@using App.DataAccess.Identity;
+
+@{
+    ViewBag.Title = "Entry";
+}
+
+@Html.Partial("_ValidationMessage")
+
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        @using (Html.BeginForm("RoleEntry", "Account", FormMethod.Post, new { id = "all", @class = "m-form", role = "form" })) {
+
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(t => t.Id)
+
+            <div class="m-form__section m-form__section--first">
+
+                @Html.FormFieldPartial((Model.Name ?? "").ToString(), new TextFieldSetting() {
+                    InputName = Html.NameFor(t => t.Name).ToString(),
+                    Label = Html.LabelForRequired(e => e.Name).ToString(),
+                    Placeholder = "Nama",
+                    CssClass = "",
+                    Style = TextFieldStyle.Simple
+                })
+
+
+                @*@Html.FormFieldPartial(Model.Actions?.Select(t => t.Id).ToList(), new ChecklistFieldSetting() {
+                        InputName = Html.NameFor(t => t.SelectedActions).ToString(),
+                        Label = Html.LabelForRequired(e => e.SelectedActions).ToString(),
+                        Placeholder = "Roles",
+                        CssClass = "",
+                        Options = Model.ActionsOpt.OrderBy(t => t.ActionName).ToList(),
+                        OptionLabelGetter = t => t.DirectCastTo<ActionAuthorization>().ActionName.Replace("_", " ").ToPascalCase(),
+                        OptionValueGetter = t => t.DirectCastTo<ActionAuthorization>().Id
+                    })*@
+
+                <div class="m-form__group form-group">
+                    <label class="">Actions</label>
+                    <div class="col-9">
+                        <div class="m-checkbox-list">
+
+                            @{ var model = Model.Actions?.Select(t => t.Id).ToList(); }
+                            @foreach (var cbItem in Model.ActionsOpt.OrderBy(t => t.ActionName).ToList()
+                                .OrderBy(t => t.ActionName.ToLower().Contains("equity") ? 0
+                                : t.ActionName.ToLower().Contains("obligasi")? 1
+                                : t.ActionName.ToLower().Contains("fixed_income") ? 2
+                                : t.ActionName.ToLower().Contains("derivative") ? 3
+                                : t.ActionName.ToLower().Contains("announcement") ? 4
+                                : t.ActionName.ToLower().Contains("index") ? 5
+                                : t.ActionName.ToLower().Contains("workday") ? 6
+                                : t.ActionName.ToLower().Contains("user") ? 7
+                                : t.ActionName.ToLower().Contains("activity") ? 8 : 9)
+                                ) {
+                                <label class="m-checkbox" style="float:unset !important;width:100%">
+                                    <input type="checkbox" name="@Html.NameFor(t => t.SelectedActions).ToString()" value="@cbItem.Id" @(model != null ? model.Contains(cbItem.Id) ? "checked" : "" : "")> @cbItem.ActionName.Replace("_", " ").ToPascalCase()
+                                    <span></span>
+                                </label>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+
+                @*@Html.FormFieldPartial(null, new DateTimeFieldSetting() {
+                        InputName = "Nilai",
+                        Label = "Nilai 1",
+                        HelpText = "asdasd",
+                        Placeholder = "Nilai",
+                        CssClass = "col-4",
+                        Style = DateTimeFieldStyle.DateOnly,
+                        UseWorkday = false
+                    })
+
+                            @Html.FormFieldPartial(null, new DateTimeFieldSetting() {
+                        InputName = "Nilai",
+                        Label = "Nilai",
+                        HelpText = "",
+                        Placeholder = "Nilai",
+                        CssClass = "col-4",
+                        Style = DateTimeFieldStyle.DateOnly
+                    })
+
+
+                            @Html.FormFieldPartial(null, new DecimalFieldSetting() {
+                        InputName = "Nilai",
+                        Label = "Nilai",
+                        HelpText = "",
+                        Placeholder = "Nilai",
+                        CssClass = "col-4"
+                    })*@
+
+
+
+                <div class="m-portlet__foot m-portlet__foot--fit">
+                    <div class="m-form__actions m-form__actions">
+                        <button type="submit" class="btn btn-primary continue">Save</button>
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+

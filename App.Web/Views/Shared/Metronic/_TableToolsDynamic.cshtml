@@ -1,0 +1,549 @@
+﻿@model TableTools
+@{
+    var prefix = !string.IsNullOrEmpty(Model?.tableName) ? (Model?.tableName + "") : "";
+}
+
+@using (Html.Section("styles")) {
+    <style>
+        .dataTables_filter {
+            display: none !important;
+        }
+    </style>
+}
+<div>
+    <div class="m-accordion m-accordion--default m-accordion--toggle-arrow" id="@(prefix)m_accordion_5" role="tablist">
+
+        <div class="m-accordion__item m-accordion__item--brand">
+            <div class="m-accordion__item-head collapsed" role="tab" id="@(prefix)m_accordion_5_item_3_head" data-toggle="collapse" href="#@(prefix)m_accordion_5_item_3_body" aria-expanded="false">
+                <span class="m-accordion__item-icon"><i class="fa flaticon-more-v5"></i></span>
+                <span class="m-accordion__item-title">Table Options</span>
+                <span class="m-accordion__item-mode"></span>
+            </div>
+            <div class="m-accordion__item-body collapse show" style="overflow:visible;" id="@(prefix)m_accordion_5_item_3_body" role="tabpanel" aria-labelledby="m_accordion_5_item_3_head" data-parent="#@(prefix)m_accordion_5">
+                <div class="m-accordion__item-content">
+                    <div id="@(prefix)table_filters_container" style="width:100%">
+                        <div class="row">
+                            <div class="form-group  m-form__group col-2">
+                                <label for="">
+
+                                </label>
+                            </div>
+                            <div class="form-group  m-form__group col-3">
+                                <label for="">
+                                    Column
+                                </label>
+                            </div>
+
+                            <div class="form-group  m-form__group col-2">
+                                <label for="">
+                                    Filter
+                                </label>
+                            </div>
+
+                            <div class="form-group  m-form__group col-5">
+                                <label for="">
+                                    Value
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row" style="margin-bottom:0.8rem">
+                        <div class="col-12" style="text-align:center">
+                            <a class="" href="javascript:void(0)" onclick="@(prefix)addFilter();"><i class="fa fa-plus-circle" style="margin-right:0.8rem;"></i>Add Filter</a>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-bottom:2rem;">
+                        <div class="col-4">
+                        </div>
+                        <div class="col-2">
+                            <a class="btn btn-primary" href="javascript:void(0)" onclick="@(prefix)applyFilter();">@*<i class="flaticon-search" style="margin-right:0.5rem;"></i>*@Search</a>
+                        </div>
+                        <div class="col-md-2" id="@(prefix)buttons">
+
+                        </div>
+                    </div>
+                    @*<div class="row">
+                        <div class="form-group m-form__group   col-md-12" id="@(prefix)search">
+                        <div class="m-input-icon m-input-icon--left">
+                        <input type="text" id="@(prefix)searchinput" class="form-control m-input" placeholder="Search" name="" value="">
+                        <span class="m-input-icon__icon m-input-icon__icon--left"><span><i class="la la-search"></i></span></span>
+                        </div>
+                        </div>
+                        </div>*@
+                    @*<div class="row">
+                        @Html.FormFieldPartial(null, new DateTimeFieldSetting() {
+                        InputName = "",
+                        Label = "From",
+                        HelpText = "",
+                        Placeholder = "Created Date",
+                        CssClass = "col-md-6",
+                        Style = DateTimeFieldStyle.DateOnly,
+                        HtmlId = prefix + "dateFrom"
+
+                        })
+
+                        @Html.FormFieldPartial(null, new DateTimeFieldSetting() {
+                        InputName = "",
+                        Label = "To",
+                        HelpText = "",
+                        Placeholder = "Created Date",
+                        CssClass = "col-md-6",
+                        Style = DateTimeFieldStyle.DateOnly,
+                        HtmlId = prefix + "dateTo"
+
+                        })
+                        </div>*@
+
+                    @if (Model?.Tools != null) {
+                        @(Model?.Tools(null))
+                    }
+
+                    @*<div class="row">
+
+                        <div class="form-group  m-form__group col-md-12">
+                        <label>Columns Show</label>
+                        <select class="form-control" id="@(prefix)columns" multiple></select>
+                        </div>
+                        </div>*@
+
+                    <div class="row">
+
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="form-group  m-form__group col-2">
+            <button class="btn btn-secondary" onclick="@(prefix)showColumnOpt();"><i class="fa fa-caret-down" style="margin-right:0.5rem;"></i>Columns</button>
+        </div>
+        <div class="col-md-6">
+
+        </div>
+        <div class="col-md-4" style="text-align:right">
+            <label>Show Entries</label>
+            <select class="rows form-control" id="@(prefix)length" style="display:unset;width:7rem;margin-right:0px">
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="All">All</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="@(prefix)columnshow" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="max-width:50vw;" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Column</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row" style="margin-bottom:1rem;">
+                    <div class="col-6">
+                        <div class="btn-group-sm mr-2" role="group" aria-label="...">
+                            <button type="button" class="m-btn btn btn-secondary" onclick="@(prefix)selectAllCol()"><i class="fa fa-check-square" style="margin-right:0.5rem"></i>Check All</button>
+                            <button type="button" class="m-btn btn btn-secondary" onclick="@(prefix)unselectAllCol()"><i class="fa fa-square" style="margin-right:0.5rem"></i>Uncheck All</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="m-checkbox-list columnshowopt row" style="padding-left:2rem">
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="@(prefix)applyColumn()">Apply</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="display:none">
+    <div class="row table_filter_row" id="@(prefix)tblf_tmp">
+        <div class="col-2">
+            <select class="rows form-control table_filter_logicopt">
+                <option value="and" selected>AND</option>
+                <option value="or">OR</option>
+            </select>
+        </div>
+        <div class="col-3">
+            <select class="rows form-control table_filter_colopts">
+                <option value="" selected>--Pilih--</option>
+            </select>
+        </div>
+        <div class="col-2" style="display:none">
+            <select class="rows form-control table_filter_operation">
+                <option value="" selected class="number date datetime string">--Pilih--</option>
+            </select>
+        </div>
+
+
+        <div class="valuefield form-group  m-form__group col-4" style="display:none"></div>
+
+        <div class="form-group m-form__group   col-1 filterdletecol">
+            <div class="form-group  m-form__group" style="padding-top:0px">
+                <div class="input-group  m-form__group  clock" style="padding-top:0px">
+                    <button class="btn btn-outline-secondary m--font-danger table_filter_delete" onclick="@(prefix)deleteFilter(this)" type="button"><i class="fa fa-times"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @*<select id="@(prefix)stringopttemplate">
+        <option value="contains" selected>contains</option>
+        <option value="==">=</option>
+        <option value="!="><></option>
+        <option value="in">in</option>
+        </select>*@
+
+
+    <select id="@(prefix)boolopttemplate">
+        <option value="==">=</option>
+        <option value="<>"><></option>
+    </select>
+
+    <select id="@(prefix)statusopttemplate">
+        <option value="==">=</option>
+    </select>
+
+    <select id="@(prefix)stringopttemplate">
+        <option value="contains" selected>contains</option>
+        <option value="==">=</option>
+        <option value="!="><></option>
+        <option value="in">in</option>
+    </select>
+
+    <select id="@(prefix)numberopttemplate">
+        <option value="==" selected>=</option>
+        <option value=">">></option>
+        <option value=">=">>=</option>
+        <option value="<="><</option>
+        <option value="<="><=</option>
+        <option value="!="><></option>
+    </select>
+
+    <select id="@(prefix)dateopttemplate">
+        <option value="==" selected>=</option>
+        <option value=">">></option>
+        <option value=">=">>=</option>
+        <option value="<"><</option>
+        <option value="<="><=</option>
+        <option value="!="><></option>
+    </select>
+
+    <select id="@(prefix)datetimeopttemplate">
+        <option value="==" selected>=</option>
+        <option value=">">></option>
+        <option value=">=">>=</option>
+        <option value="<"><</option>
+        <option value="<="><=</option>
+        <option value="!="><></option>
+    </select>
+
+
+    <select id="@(prefix)nullabledatetimeopttemplate">
+        <option value="==" selected>=</option>
+        <option value=">">></option>
+        <option value=">=">>=</option>
+        <option value="<"><</option>
+        <option value="<="><=</option>
+        <option value="!="><></option>
+    </select>
+
+    <div class="stringfiltervalue" id="@(prefix)stringfiltervalue">
+        <div class="input-groupinput-group">
+            <input type="text" class="form-control m-input table_filter_value filtervalue" placeholder="Search" name="" value="">
+        </div>
+    </div>
+
+    <div class="numberfiltervalue" id="@(prefix)numberfiltervalue">
+        <div class="input-group">
+            <input type="text" class="form-control m-input numberInputMask" step="0.01" placeholder="Value" value="">
+            <input type="hidden" class="filtervalue" value="">
+        </div>
+    </div>
+
+    <div class="statusfiltervalue" id="@(prefix)statusfiltervalue">
+        <div class="input-groupinput-group">
+            <select class="form-control filtervalue">
+                <option value="Saved" selected>Saved</option>
+                <option value="Draft">Draft</option>
+
+                @if (WebHelper.IsUserAdmin()) {
+                    <option value="Deleted">Deleted</option>
+                }
+
+            </select>
+        </div>
+    </div>
+
+
+    <div class="boolfiltervalue" id="@(prefix)boolfiltervalue">
+        <div class="input-groupinput-group">
+            <select class="form-control filtervalue">
+                <option value="true" selected>True</option>
+                <option value="false">False</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="datefiltervalue" style="padding-top:0px;width:100%;" id="@(prefix)datefiltervalue">
+        <div class="input-group m-form__group date filterdatefieldbox" style="padding-top:0px">
+
+            <input type="text" class="form-control m-input datetime-display" placeholder="Pick Date" value="" name="" readonly="" data-mindate="'0001-01-01T00:00:00.0000000">
+            <input type="hidden" class="datetime-input filtervalue" value="" name="">
+            <div class="input-group-append">
+                <button class="btn btn-secondary datetime-reset" type="button">
+                    <i class="fa fa-times"></i>
+                </button>
+                @*<button class="btn btn-secondary datetime-toggle" type="button">
+                    <i class="fa fa-calendar"></i>
+                    </button>*@
+            </div>
+        </div>
+    </div>
+
+    <div class="datefiltervalue" style="padding-top:0px;width:100%;" id="@(prefix)nullabledatetimefiltervalue">
+        <div class="input-group m-form__group date filterdatefieldbox" style="padding-top:0px">
+
+            <input type="text" class="form-control m-input datetime-display" placeholder="Pick Date" value="" name="" readonly="" data-mindate="'0001-01-01T00:00:00.0000000">
+            <input type="hidden" class="datetime-input filtervalue" value="" name="">
+            <div class="input-group-append">
+                <button class="btn btn-secondary datetime-reset" type="button">
+                    <i class="fa fa-times"></i>
+                </button>
+                @*<button class="btn btn-secondary datetime-toggle" type="button">
+                    <i class="fa fa-calendar"></i>
+                    </button>*@
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@using (Html.Section("styles")) {
+    <style>
+    #@(prefix)table_filters_container > div:nth-child(2) > div:nth-child(1) > select{
+        display : none;
+    }
+    </style>
+}
+
+@using (Html.Section("scripts")) {
+
+    <script>
+
+
+    window['@(prefix)dynfiltering'] = [];
+
+
+
+    function @(prefix)unselectAllCol() {
+
+
+        document.querySelectorAll('#@(prefix)columnshow input[type=checkbox]').forEach(function (e) { e.checked = false; })
+
+}
+
+
+function @(prefix)selectAllCol() {
+
+
+        document.querySelectorAll('#@(prefix)columnshow input[type=checkbox]').forEach(function (e) { e.checked = true; })
+
+}
+
+
+function @(prefix)applyColumn() {
+
+        var selected = $('#@(prefix)columnshow .columnshowopt input[type=checkbox]').map(function (cb) {
+
+        return {
+            checked: this.checked,
+            targets: $(this).val(),
+            name: $(this).data('name')
+        };
+    });
+
+    var selectedname = [];
+
+    selected.each(function () {
+
+
+        var column = window['spopDt@(prefix)'].column(this.targets);
+
+    column.visible(this.checked);
+
+    if (this.checked) selectedname.push({ name: this.name })
+
+});
+
+
+    $('#@(prefix)columnshow').modal('hide');
+
+    window.localStorage.setItem(window.location + "#" + '@(prefix)', JSON.stringify(selectedname));
+
+
+}
+
+function @(prefix)addFilter() {
+
+
+
+        var filter = $('#@(prefix)tblf_tmp').clone();
+
+
+    filter.removeAttr('id');
+
+
+    $('#@(prefix)table_filters_container').append(filter)
+
+
+}
+
+
+function @(prefix)showColumnOpt() {
+    var selectedStr = window.localStorage.getItem(window.location + "#" + '@(prefix)');
+
+    var selectedCol = [];
+    debugger;
+    try {
+        selectedCol = JSON.parse(selectedStr) || [];
+    } catch (e) {
+
+    }
+
+        document.querySelectorAll('.columnshowopt input[type=checkbox]').forEach(function (col) {
+            var isSelected = selectedCol.filter(function (obj) { return obj.name === col.dataset.name}).length > 0;
+            col.checked = isSelected;
+        });
+
+
+    $('#@(prefix)columnshow').modal('show');
+
+}
+
+
+function @(prefix)applyFilter() {
+
+        var tmpFilters = [];
+        var rowIndex = 0;
+
+        $('#@(prefix)table_filters_container').find('.table_filter_row').each(function (row) {
+
+
+        var filter = $(this).find('.table_filter_operation').val();
+        var data = $(this).find('.table_filter_colopts').val();
+
+        if (filter && data) {
+
+            tmpFilters.push({
+                logicgate: $(this).find('.table_filter_logicopt').val(),
+                value: $(this).find('.filtervalue').val(),
+                filter: filter,
+                data: data,
+                index: rowIndex,
+                type: $(this).find('.table_filter_colopts option:selected').data('type')
+            })
+            rowIndex++;
+        }
+    });
+
+
+    window['@(prefix)dynfiltering'] = tmpFilters;
+
+
+
+    window['spopDt@(prefix)'].draw();
+
+
+}
+
+
+
+$(document).on('change', '#@(prefix)table_filters_container .numberInputMask', function () {
+
+
+        $(this).parent().find('input[type=hidden].filtervalue').val($(this).numberVal());
+        $(this).parent().find('input[type=hidden].filtervalue').trigger('change');
+
+    })
+
+
+    $(document).on('change', '#@(prefix)table_filters_container .table_filter_colopts', function () {
+
+        var valuefield = $(this).parent().parent().find('.valuefield');
+        var type = $(this).find('option:selected').data('type');
+        var data = $(this).val();
+
+
+
+
+        var valuetemplate = $('#@(prefix)' + type + 'filtervalue');
+
+    var operand = valuefield.parent().find('.table_filter_operation');
+
+
+    operand.html($('#@(prefix)' + type + 'opttemplate').html());
+
+
+    valuefield.html(valuetemplate.html() || '');
+
+    console.log(type);
+
+    if (type === 'status') {
+        operand.parent().show();
+        valuefield.show();
+    } else if (type === 'string') {
+        operand.parent().show();
+        valuefield.show();
+    } else if (type === 'date' || type === 'nullabledatetime') {
+        valuefield.show();
+        operand.parent().show();
+        window.InitDateTimePicker(valuefield, 'date', null, { useworkdays: false });
+    } else if (type === 'datetime') {
+        valuefield.show();
+        window.InitDateTimePicker($(this).find('.valuefield'), 'date', null, { useworkdays: false });
+        operand.parent().show();
+    } else if (type === 'number') {
+        operand.parent().show();
+        valuefield.show();
+    } else if (type === 'bool') {
+        operand.parent().show();
+        valuefield.show();
+    } else if(type === 'custom'){
+        operand.parent().hide();
+        valuefield.hide();
+    } else {
+        operand.parent().hide();
+        valuefield.hide();
+    }
+
+
+
+})
+
+
+function @(prefix)deleteFilter(sender) {
+
+        $(sender).parent().parent().parent().parent().remove();
+    }
+
+    var watchChanged = false;
+
+    </script>
+
+}

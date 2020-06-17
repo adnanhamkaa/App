@@ -1,0 +1,126 @@
+﻿
+@if (!Html.ViewData.ModelState.IsValid) {
+    @*<div id="valsumcontainer">
+
+        </div>*@
+
+<div class="m-alert m-alert--outline alert alert-info alert-danger fade show" id="valsumTemplate" style="background-color:#fff3f5;">
+    @*@Html.ValidationSummary(false, "", new { @class = "" })*@
+
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"></button>
+
+    <div class="row">
+        <div class="col-12" style="font-size: 1.2rem;">
+            <strong><i class="fa fa-exclamation-triangle" style="margin-right:1rem"></i> Validation Errors</strong>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="validation-summary-errors" data-valmsg-summary="true" id="valsumid">
+                <ul></ul>
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+
+
+    using (Html.Section("scripts")) {
+        <script>
+            var orierrs = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Html.ViewData.ModelState.Select(t => new { Key = t.Key, Error = t.Value.Errors.Select(e => e.ErrorMessage).ToArray() }).ToArray()));
+            var errs = orierrs.filter(function (obj) { return obj.Key; });
+            var globalErrs = orierrs.filter(function (obj) { return !obj.Key; });
+            errs = errs || [];
+            var forms = [];
+
+
+            var valsum = $('#valsumid');
+
+            if ($('form#all .m-form__section')) {
+                //showPreview($('form#all .m-form__section'));
+                $('form#all .m-form__section').each(function (section) {
+
+                    var v = this;
+                    var title = $(v).data('title') || '';
+
+                    if (!title) {
+                        var tabs = $(v).parents('.tab-pane');
+                        if (tabs.length > 0) {
+                            title = $('a.nav-link[href="#' + tabs[0].id + '"]').html();
+                        }
+                    }
+
+
+                    $(this).find('[name]').each(function (e) {
+
+                        var formname = this.name;
+
+                        var err = errs.filter(function (obj) { return obj.Key == formname });
+
+                        errs = errs.filter(function (obj) { return obj.Key != formname });
+
+                        err = err || [];
+
+
+                        if (err.length > 0) {
+                            console.log(err)
+                            err.forEach(function (obj) {
+                                obj.Error.forEach(function (err) {
+                                    if(!title)
+                                        valsum.append(`<li>${err}</li>`);
+                                    else
+                                        valsum.append(`<li><strong>${title}</strong> - ${err}</li>`);
+
+                                });
+
+                            })
+                        }
+
+                    })
+                })
+
+
+            } else {
+
+                $('form [name]').each(function (e) {
+
+                    var formname = this.name;
+
+                    var err = errs.filter(function (obj) { return obj.Key == formname });
+
+                    errs = errs.filter(function (obj) { return obj.Key != formname });
+
+                    err = err || [];
+
+
+                    if (err.length > 0) {
+                        err.forEach(function (obj) {
+
+                            obj.Error.forEach(function (err) {
+
+                                valsum.append(`<li>${err}</li>`);
+
+                            });
+
+                        })
+                    }
+
+                })
+            }
+
+            globalErrs.forEach(function (er) {
+                er.Error.forEach(function (err) {
+
+                    valsum.append(`<ol>${err}</ol>`);
+
+                });
+            })
+
+        </script>
+    }
+
+}

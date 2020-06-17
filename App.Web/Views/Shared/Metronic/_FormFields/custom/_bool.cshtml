@@ -1,0 +1,73 @@
+﻿@using App.Web.Utilities.Settings
+@inherits FormFieldRazorPage<bool?, BoolFieldSetting>
+@{
+    var random = Randomer.Self;
+    var stg = FormFieldSetting;
+    var inputId = $"field-input-{random.Next()}";
+    var valMsg = Html.ValidationMessage(stg.InputName);
+    var hasError = valMsg != null && valMsg.ToString().StripHtmlTags().Trim().Length > 0;
+
+    var yesChecked = Model == true;
+    var noChecked = stg.AllowNull ? (Model == false) : (Model != true);
+    var defaultUnchecked = stg.DefaultUnchecked == null ? false : stg.DefaultUnchecked;
+    var nullChecked = Model == null;
+}
+<div class="form-group @(hasError ? "has-error" : "") @stg.CssClass" id="@stg.HtmlId">
+    @if (!string.IsNullOrWhiteSpace(stg.Label)) {
+        if (stg.Label.Contains("</label>")) {
+
+            @Html.Raw(stg.Label)
+        } else {
+            <label class="form-control-label" for="@inputId">
+                @Html.Raw(stg.Label)
+            </label>
+
+        }
+    }
+    <div class="col-md-@(string.IsNullOrWhiteSpace(stg.Label) ? 12 : 8) radio-input">
+        <div class="mt-radio-list" id="@inputId">
+            <label class="mt-radio mt-radio-outline">
+                @if (Model == null && (bool)defaultUnchecked)
+                {
+                    <input type="radio" name="@stg.InputName" id="@inputId-true" value="true">
+                }
+                else
+                {
+                    <input type="radio" name="@stg.InputName" id="@inputId-true" value="true" @(yesChecked ? "checked" : "")>
+                }
+
+                
+                @stg.YesLabel
+                <span></span>
+            </label>
+            <label class="mt-radio mt-radio-outline">
+                @if (Model == null && (bool)defaultUnchecked)
+                {
+                    <input type="radio" name="@stg.InputName" id="@inputId-false" value="false">
+                }
+                else
+                {
+                    <input type="radio" name="@stg.InputName" id="@inputId-false" value="false" @(noChecked ? "checked" : "")>
+                }
+
+                @stg.NoLabel
+                <span></span>
+            </label>
+            @if (stg.AllowNull) {
+                <label class="mt-radio mt-radio-outline">
+                    <input type="radio" name="@stg.InputName" id="@inputId-null" value="" @(nullChecked ? "checked" : "")>
+                    @stg.NullLabel
+                    <span></span>
+                </label>
+            }
+        </div>
+        @if (hasError) {
+            <div class="help-block small">
+                @valMsg
+            </div>
+        }
+        <div class="small">
+            @Html.Raw(stg.HelpText)
+        </div>
+    </div>
+</div>

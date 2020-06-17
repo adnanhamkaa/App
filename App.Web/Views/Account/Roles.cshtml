@@ -1,0 +1,118 @@
+﻿
+@{
+    ViewBag.Title = "Roles";
+}
+
+<div class="m-portlet m-portlet--mobile">
+    <div class="m-portlet__head">
+        <div class="m-portlet__head-caption">
+            <div class="m-portlet__head-title">
+                <h3 class="m-portlet__head-text"></h3>
+            </div>
+        </div>
+        <div class="m-portlet__head-tools">
+            <ul class="m-portlet__nav">
+                <li class="m-portlet__nav-item">
+                    <a href="/account/RoleEntry" class="btn btn-focus m-btn m-btn--custom m-btn--pill m-btn--icon m-btn--air">
+                        <span>
+                            <i class="fa fa-plus"></i>
+                            <span>Add New</span>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+    <div class="m-portlet__body">
+
+        @Html.Partial("~/Views/Shared/Metronic/_TableToolsDynamic.cshtml")
+
+        <table class="table table-striped table-bordered table-hover table-checkable" id="users">
+            <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>Nama</th>
+                    <th>Log</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot>
+                <tr>
+                    <th>Action</th>
+                    <th>Nama</th>
+                    @*<th>Actions</th>*@
+                    <th>Log</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+
+
+@section scripts{
+    <style>
+        #override.fordynamic {
+            display: none;
+        }
+    </style>
+    
+    <script>
+        var dtListing = {};
+        var ds = [];
+
+        var roles = @Html.Raw(@ViewBag.Actions??"''");
+
+        var columns = [
+            { defaultContent: '-', targets: '_all' },
+
+            {
+                render: function (data, type, row) {
+
+                    return `<div class="btn-group">
+                                <a href="/account/RoleEntry/${row.Id}" class="btn btn-secondary btn-sm"><i class="fa fa-pencil-alt m--font-primary"></i></a>
+                                <form action="/account/DeleteRole/${row.Id}" method="POST" onsubmit="return deleteListing()"><button type="submit" data-id="${row.Id}"  class="btn btn-secondary btn-sm"><i class="fa fa-trash-alt m--font-primary"></i></button></form>
+                            </div>`
+                },
+                targets: 0
+            },
+            {
+                name: "Name", label: "Nama",
+                data: "Name", targets: 1,
+                orderable: true,
+                searchable: true
+            },
+            //{
+            //    name: "Actions", label: "Actions",
+            //    data: "Actions", targets: 1, render: function (data, type, row) {
+            //        debugger;
+            //        if (Array.isArray(data)) {
+            //            return data.map(function (t) {
+            //                return t.ActionName.replace(/_/g,' ')
+            //            }).join(', ');
+            //        }
+            //        return null;
+            //    },
+            //},
+            {
+                name: "CreatedDate", label: "Log",
+                data: "Log", targets: 2,
+                render: function (data, type, row) {
+                    return getLogText(row);
+                },
+            }
+        ];
+
+        $(document).ready(function () {
+            DatatableInit($('#users'), { columnDefs: columns, url: '/account/RoleList' })
+        });
+
+        function deleteListing() {
+            if (!confirm("Apakah Anda yakin menghapus data ini ?")) {
+                return false;
+            }
+        }
+    </script>
+
+}

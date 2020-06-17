@@ -1,0 +1,53 @@
+﻿@using App.Web.Utilities.Settings
+@using Newtonsoft.Json
+@inherits FormFieldRazorPage<IEnumerable<string>, StringListFieldSetting>
+@{
+    var random = Randomer.Self;
+    var stg = FormFieldSetting;
+    var inputId = $"field-input-{random.Next()}";
+    var valMsg = Html.ValidationMessage(stg.InputName);
+    var hasError = valMsg != null && valMsg.ToString().StripHtmlTags().Trim().Length > 0;
+}
+
+@using (Html.Section("script-page-level-plugins", "string-list-vue")) {
+    <script src="~/assets/custom/vue-components/string-list.js" type="text/javascript"></script>
+}
+
+@using (Html.Section("script-page-level-plugins")) {
+    <script type="text/x-template" id="@inputId-vue-tpl">
+        <string-list html-id="@inputId" :input-name="inputName" :string-items="stringItems"></string-list>
+    </script>
+    <script type="text/javascript">
+        $(function() {
+            var vue = {
+                el: '#@inputId-string-list-box',
+                template:'#@inputId-vue-tpl',
+                data: {
+                    stringItems: @Html.Raw(JsonConvert.SerializeObject(Model.ToArray())),
+                    inputName: '@stg.InputName'
+                }
+            };
+            PortalAK.LoadVue(vue);
+        })
+    </script>
+}
+
+<div class="form-group @(hasError ? "has-error" : "") @stg.CssClass" id="@stg.HtmlId">
+    @if (!string.IsNullOrWhiteSpace(stg.Label)) {
+        <label for="@inputId" class="control-label col-md-3">
+            @Html.Raw(stg.Label)
+        </label>
+    }
+    <div class="col-md-@(string.IsNullOrWhiteSpace(stg.Label) ? 12 : 8)">
+        <div id="@inputId-string-list-box"></div>
+
+        @if (hasError) {
+            <div class="help-block small">
+                @valMsg
+            </div>
+        }
+        <div class="small">
+            @Html.Raw(stg.HelpText)
+        </div>
+    </div>
+</div>

@@ -1,0 +1,146 @@
+﻿@using App.Web.Utilities.Settings
+@inherits FormFieldRazorPage<decimal?, DecimalZeroFieldSetting>
+@{
+    var random = Randomer.Self;
+    var stg = FormFieldSetting;
+    var inputId = $"field-input-{random.Next()}";
+    var valMsg = string.IsNullOrEmpty(stg.InputName) ? null : Html.ValidationMessage(stg.InputName);
+    var hasError = valMsg != null && valMsg.ToString().StripHtmlTags().Trim().Length > 0;
+}
+<div class="form-group  m-form__group  @(hasError ? "has-danger" : "") @stg.CssClass" id="@stg.HtmlId">
+    @if (!string.IsNullOrWhiteSpace(stg.Label)) {
+        if (stg.Label.Contains("</label>")) {
+
+            @Html.Raw(stg.Label)
+        } else {
+            <label for="@inputId">
+                @Html.Raw(stg.Label)
+            </label>
+
+        }
+    }
+    <div class="input-group">
+        @if (!string.IsNullOrEmpty(stg.LeftAddon?.ToString())) {
+            <div class="input-group-prepend">
+                <span class="input-group-text">@stg.LeftAddon</span>
+            </div>
+        }
+        @{bool isDecimalPlacesExists = (Model % 1) > 0; }
+        <input type="text" id="@inputId" class="form-control m-input numberInputMask-zero" autocomplete="off" step="0.01" @(stg.Disabled ? "readonly" : "")
+               placeholder="@stg.Placeholder"
+               @(stg.Changed ? "data-changed='changed'" : "")
+               value="@(Model == null ? Model : isDecimalPlacesExists? Model: Convert.ToInt64(Model))"
+               @(stg.MaxValue != null ? "data-maxvalue=" + stg.MaxValue.ToString() + "" : "data-maxvalue=99999999999999999") />
+
+        <input type="hidden" id="@inputId-value" name="@stg.InputName" value="@(Model == null ? Model : isDecimalPlacesExists? Model: Convert.ToInt64(Model))" />
+        @*@stg.RightAddon*@
+
+        @if (!string.IsNullOrEmpty(stg.RightAddon?.ToString())) {
+            <div class="input-group-append">
+                <span class="input-group-text">@stg.RightAddon</span>
+            </div>
+        }
+
+    </div>
+
+    @if (hasError) {
+        <div class="form-control-feedback" style="width: 100%;float:left;color:#f4516c;padding-left:20%">
+            @valMsg
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(stg.HelpText)) {
+        <span class="m-form__help">
+            @Html.Raw(stg.HelpText)
+        </span>
+    }
+</div>
+
+@using (Html.Section("scripts")) {
+
+    <script>
+
+        var watch = @Html.Raw(stg.ChangedWatch.ToString().ToLower());
+        
+
+        $(document).ready(function () {
+            var numberVal = $('#@inputId').val()
+            var result = numberManipulator(numberVal)
+            $('#@inputId').val(result);
+            $('#@inputId').trigger('change');
+
+            @*if (watch) {
+                $(document).on('change', '#@inputId', function () {
+
+                    $(this).attr('data-changed', 'changed');
+                });
+            }*@
+
+            function numberManipulator(numberVal) {
+                if (numberVal != '') {
+                    var numberDetail = numberVal.split('.')
+                    var trueValue = parseInt(numberDetail[0])
+                    var result = $.number(trueValue);
+
+                    var point = 0
+                    if (numberDetail.length > 1) {
+                        point = parseInt(numberDetail[1])
+
+                        while (point % 10 == 0) {
+                            point /= 10;
+                        }
+                    }
+
+                    if (point > 0) {
+                        var divider = Math.pow(10, point)
+                        result = $.number(trueValue / divider, point)
+                    }
+
+                    return result;
+                }
+
+                return numberVal
+            }
+            
+
+            $('body').on('change', '#@inputId', function (e) {
+                var trueVal = $(this).val()
+                trueVal = trueVal.replaceAll(',', '')
+                var pointDetail = trueVal.split('.')
+                var counter = 0
+                var result = $.number(parseFloat(trueVal))
+                if (pointDetail.length > 1) {
+                    var point = parseInt(pointDetail[1])
+                    
+                    while (point >= 1) {
+                        point /= 10;
+                        counter++
+                    }
+
+                    if (counter > 0) {
+                        result = $.number(parseFloat(trueVal), counter)
+                    }
+                }
+                
+                $(this).val(result)
+                //console.log($(this).val(), result)
+                $('#@inputId-value').val(trueVal.replaceAll(',', ''));
+                $('#@inputId-value').trigger('change');
+            })
+
+        })
+    </script>
+
+    if (!string.IsNullOrEmpty(stg.ReferenceFrom)) {
+<script>
+            $('body').on('change', '@stg.ReferenceFrom input[type=text]', function () {
+                var value = $(this).val();
+                if ($('#@inputId').data('changed') !== 'changed') {
+                    $('#@inputId').val(value).trigger('change');
+                }
+            })
+</script>
+    }
+
+
+}

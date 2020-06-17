@@ -1,0 +1,76 @@
+﻿@model App.Web.Areas.Samples.Model.MovieViewModel
+@{
+    ViewBag.Title = "Entry";
+}
+
+@Html.Partial("_ValidationMessage")
+<div class="m-portlet">
+
+    @using (Html.BeginForm("Entry", "Movie", new { area = "Samples" }, FormMethod.Post, new { id = "all", @class = "m-form" })) {
+        <div class="m-portlet__body">
+            <div class="m-form__section m-form__section--first" data-title="">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="@Html.NameFor(t => t.Form.Id)" value="@(Model.Form?.Id)" />
+
+                @Html.FormFieldPartial((Model.Form?.Name ?? "").ToString(), new TextFieldSetting() {
+                    InputName = Html.NameFor(t => t.Form.Name).ToString(),
+                    Label = Html.LabelForRequired(e => e.Form.Name).ToString(),
+                    HelpText = "",
+                    Placeholder = "Name",
+                    CssClass = "",
+                    Style = TextFieldStyle.Simple
+                })
+
+                @Html.FormFieldPartial((Model.Form?.Category ?? "").ToString(), new SelectFieldSetting() {
+                    InputName = Html.NameFor(t => t.Form.Category).ToString(),
+                    Label = Html.LabelForRequired(e => e.Form.Category).ToString(),
+                    HelpText = "",
+                    Placeholder = "Category",
+                    CssClass = "",
+                    AddEmptyOption = true,
+                    EmptyOptionLabel = "--Pilih--",
+                    Options = Model.Categories,
+                    OptionValueGetter = t => t.ToString(),
+                    OptionLabelGetter = t => t.ToString()
+                })
+
+                @Html.FormFieldPartial((Model.Form?.Language ?? "").ToString(), new RadioFieldSetting() {
+                   InputName = Html.NameFor(t => t.Form.Language).ToString(),
+                   Label = Html.LabelForRequired(e => e.Form.Language).ToString(),
+                   HelpText = "",
+                   Placeholder = "Language",
+                   CssClass = "",
+                   Options = new List<string>() { "ID","EN" },
+                   OptionValueGetter = t => t.DirectCastTo<string>(),
+                   OptionLabelGetter = t => t.DirectCastTo<string>()
+                })
+
+                @Html.FormFieldPartial((Model.Form?.ReleaseDate), new DateTimeFieldSetting() {
+                    InputName = Html.NameFor(t => t.Form.ReleaseDate).ToString(),
+                    Label = Html.LabelForRequired(e => e.Form.ReleaseDate).ToString(),
+                    HelpText = "",
+                    Placeholder = "Name",
+                    Style = DateTimeFieldStyle.DateOnly
+                })
+
+                @Html.FormFieldPartial(Model.Form?.Rating, new IntFieldSetting() {
+                    InputName = Html.NameFor(t => t.Form.Rating).ToString(),
+                    Label = Html.LabelForRequired(e => e.Form.Rating).ToString(),
+                    HelpText = "",
+                    Placeholder = "Rating",
+                    CssClass = ""
+                })
+
+            </div>
+
+
+        </div>
+        <div class="m-portlet__foot m-portlet__foot--fit">
+            <div class="m-form__actions m-form__actions">
+                <button type="submit" name="@Html.NameFor(t => t.Form.IsDraft).ToString()" value="true" class="btn btn-secondary">Save as Draft</button>
+                <button type="submit" name="@Html.NameFor(t => t.Form.IsDraft).ToString()" value="false" class="btn btn-primary btnsave">Save</button>
+            </div>
+        </div>
+    }
+
+</div>

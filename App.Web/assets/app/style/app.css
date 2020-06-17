@@ -1,0 +1,236 @@
+﻿.tabfeedback{
+    color:red !important;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.form-control[readonly] {
+    border-color: #f4f5f8;
+    color: #6f727d;
+    background-color: #f4f5f8;
+}
+
+.preview-title{
+    margin-top:1rem;
+}
+
+#previewwindow .select2.select2-container.select2-container--default{
+    width:100% !important;
+}
+
+.datetimepicker table tr td.disabled,
+.datetimepicker table tr td.disabled:hover,
+.datetimepicker table tr td.disabled.new,
+.datetimepicker table tr td.disabled.new:hover,
+.datetimepicker table tr td.disabled.old,
+.datetimepicker table tr td.disabled.old:hover {
+    color: #dcd9d9;
+    background: none;
+}
+
+
+/* custom from user feedback */
+
+.m-accordion .m-accordion__item--brand .m-accordion__item-head.collapsed {
+    background-color: #390091 !important;
+}
+
+.m-accordion .m-accordion__item--brand .m-accordion__item-head, .m-accordion .m-accordion__item--brand .m-accordion__item-head:hover {
+    background-color: #390091 !important;
+}
+
+.btn-focus {
+    /* color: #fff; */
+    background-color: #ff4477;
+    border-color: #ff4477;
+}
+
+.m--font-primary {
+    color: #ff4477 !important;
+}
+
+.dataTables_wrapper .pagination .page-item.active > .page-link {
+    background: #ff4477;
+    color: #fff;
+}
+
+/*.nav-item:first-child {
+    color: #fff;
+    background-color: #390091;
+    border-color: #390091;
+    border-radius: 5px;
+}*/
+
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+    color: #fff;
+    background-color: #390091;
+    border-color: #390091; 
+    border-radius: 5px;
+}
+
+/* add active color on form tab */
+.list-active {
+    background-color: #390091;
+    border-radius: 5px
+}
+
+.link-active {
+    background-color: #390091;
+    color: #fff;
+    border-color: transparent;
+    border-radius: 5px
+}
+
+.tabfeedback {
+    color: #6f727d !important;
+}
+
+a.nav-link.active.tabfeedback {
+    color: #fff !important;
+}
+
+/* move label to left of input field */
+.m-form .m-form__group {
+    overflow: hidden;
+    height: auto;
+    margin-bottom: 0;
+    padding-top: 5px;
+    padding-bottom: 0px;
+}
+
+.m-form .form-control-label, .m-form .col-form-label, .m-form .m-form__group label, .form-group.m-form__group label, .form-group label {
+    width: 20%;
+    float: left;
+    color: #3f4047;
+}
+
+span.m-form__help {
+    padding-left: 20%;
+}
+
+.radio-input {
+    width: 100%;
+    overflow: auto;
+    height: auto;
+}
+
+form-group m-form__group col-3 label {
+    width: 100%
+}
+
+/* change button color */
+.dataTables_wrapper .pagination .page-item:hover > .page-link, .dataTables_wrapper .pagination .page-item.previous > .page-link:hover, .dataTables_wrapper .pagination .page-item.next > .page-link:hover, .dataTables_wrapper .pagination .page-item.last > .page-link:hover, .dataTables_wrapper .pagination .page-item.first > .page-link:hover {
+    color: #fff;
+    background-color: #ff4477;
+}
+
+/* pagination color */
+.dataTables_wrapper .pagination .page-item.previous > .page-link, .dataTables_wrapper .pagination .page-item.next > .page-link, .dataTables_wrapper .pagination .page-item.last > .page-link, .dataTables_wrapper .pagination .page-item.first > .page-link {
+    background: #ff4477;
+    color: #fff;
+}
+
+/* modal preview */
+
+#presavewindow div {
+    height: auto;
+    overflow: hidden;
+}
+
+#previewwindow div {
+    height: auto;
+    overflow: hidden;
+}
+
+#previewwindow select {
+    width: 80%;
+}
+/* portlet body */
+.m-portlet .m-portlet__body {
+    height: auto;
+    overflow: hidden;
+    padding: 2.2rem 2.2rem;
+}
+
+.m-portlet__body div {
+    height: auto;
+    overflow: hidden;
+}
+
+#previewwindow .select2.select2-container.select2-container--default {
+    width: 80% !important;
+}
+
+/* button hover */
+.btn-primary:hover, .exportExcel:hover {
+    color: #fff;
+    background-color: #840ad9 !important;
+    border-color: #7c0acd;
+}
+
+.m-menu__item--active {
+    background-color: #290069;
+}
+
+.form-group.m-form__group.col-1.filterdletecol {
+    width: 120px;
+    padding-left: 0px;
+}
+
+.dataTables_empty{
+    text-align: left;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #ffffff;
+}
+
+.table-bordered th, .table-bordered td {
+    border: 1px solid #d8d8d8;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #e5f0f5;
+}
+
+.dataTable thead,
+.dataTable tfoot {
+    background-color: #f1f1f1;
+}
+
+
+.m-form span.m-form__help {
+    display: inline-block;
+    padding-top: 0px;
+    font-style: italic;
+}
+
+.form-group.m-form__group {
+    padding-bottom: 10px;
+}
+
+.form-group.m-form__group.has-danger {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.has-danger .form-control-feedback {
+    color: #f4516c;
+    margin-bottom: 10px;
+    margin-top: 0px;
+}
+
+.has-danger.radio-input .m-form__help {
+    padding-left: 20%;
+}
+
+.input-group, .form-group.m-form__group select {
+    width: 80%;
+    float: left;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+}

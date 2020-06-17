@@ -1,0 +1,196 @@
+﻿@model App.Web.Areas.Samples.Model.TicketViewModel
+
+
+@{
+    ViewBag.Title = "Order Ticket";
+}
+
+
+@Html.Partial("_ValidationMessage")
+<div class="m-portlet">
+
+    @using (Html.BeginForm("Index", "Ticket", new { area = "Samples" }, FormMethod.Post, new { id = "all", @class = "m-form" })) {
+        <div class="m-portlet__body">
+            <div class="m-form__section m-form__section--first" data-title="">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="@Html.NameFor(t => t.Form.Id)" value="@(Model.Form?.Id)" />
+
+                @Html.FormFieldPartial(Model.Form?.ShowTimeId, new SelectFieldSetting() {
+                    InputName = Html.NameFor(t => t.Form.ShowTimeId).ToString(),
+                    Label = Html.LabelForRequired(e => e.Form.ShowTimeId).ToString(),
+                    HelpText = "",
+                    Placeholder = "Show Time",
+                    CssClass = "",
+                    AddEmptyOption = true,
+                    EmptyOptionLabel = "--Pilih--",
+                    Options = Model.ShowTimes,
+                    OptionLabelGetter = t => t.DirectCastTo<ShowTimeForm>().ToString(),
+                    OptionValueGetter = t => t.DirectCastTo<ShowTimeForm>().Id,
+                    HtmlId = "showtime"
+                })
+
+
+                @Html.FormFieldPartial(Model.Form?.SeatNumber, new TextFieldSetting() {
+                    InputName = Html.NameFor(t => t.Form.SeatNumber).ToString(),
+                    Label = Html.LabelForRequired(e => e.Form.SeatNumber).ToString(),
+                    HelpText = "",
+                    Placeholder = "Seat Number",
+                    Style = TextFieldStyle.Simple
+                })
+
+                @Html.FormFieldPartial(Model.Form?.PaymentMethod, new SelectFieldSetting() {
+                     InputName = Html.NameFor(t => t.Form.PaymentMethod).ToString(),
+                     Label = Html.LabelForRequired(e => e.Form.PaymentMethod).ToString(),
+                     HelpText = "",
+                     Placeholder = "Payment Method",
+                     CssClass = "",
+                     AddEmptyOption = true,
+                     EmptyOptionLabel = "--Pilih--",
+                     Options = Model.PaymentMethods,
+                     OptionLabelGetter = t => t.ToString(),
+                     OptionValueGetter = t => t.ToString()
+                 })
+
+
+                @Html.FormFieldPartial(Model.Form?.OriginalPrice, new DecimalFieldSetting() {
+                    InputName = Html.NameFor(t => t.Form.OriginalPrice).ToString(),
+                    Label = Html.LabelForRequired(e => e.Form.OriginalPrice).ToString(),
+                    HelpText = "",
+                    Placeholder = "Original Price",
+                    HtmlId = "oriprice",
+                    Disabled = true
+                })
+
+                @Html.FormFieldPartial(Model.Form?.PromoCode, new TextFieldSetting() {
+                    InputName = Html.NameFor(t => t.Form.PromoCode).ToString(),
+                    Label = Html.LabelForRequired(e => e.Form.PromoCode).ToString(),
+                    HelpText = "",
+                    Placeholder = "Promo Code",
+                    HtmlId = "promocode",
+                    Style = TextFieldStyle.Simple
+                })
+
+                @Html.FormFieldPartial(Model.Form?.Discount, new DecimalFieldSetting() {
+                    InputName = Html.NameFor(t => t.Form.Discount).ToString(),
+                    Label = Html.LabelForRequired(e => e.Form.Discount).ToString(),
+                    HelpText = "",
+                    Placeholder = "Discount",
+                    HtmlId = "discount",
+                    Disabled = true
+                })
+
+
+                @Html.FormFieldPartial(Model.Form?.Price, new DecimalFieldSetting() {
+                    InputName = Html.NameFor(t => t.Form.Price).ToString(),
+                    Label = Html.LabelForRequired(e => e.Form.Price).ToString(),
+                    HelpText = "",
+                    Placeholder = "Price",
+                    HtmlId = "price",
+                    Disabled = true
+                })
+
+
+            </div>
+
+
+        </div>
+        <div class="m-portlet__foot m-portlet__foot--fit">
+            <div class="m-form__actions m-form__actions">
+                <button type="submit" class="btn btn-primary btnsave">Save</button>
+            </div>
+        </div>
+    }
+
+</div>
+
+
+@section scripts{
+    <script>
+
+        var currShowtime = {};
+        var currCoupon = {};
+        var lastcode = '';
+
+        $('#showtime select').change(function () {
+            var value = $('#showtime select').val();
+
+            ajaxCall('/samples/ticket/ShowtimeDetail/' + value, null, function (result) {
+
+                currShowtime = result || {};
+
+                $('#oriprice input[type=text]').numberVal(result.Price);
+                $('#oriprice input[type=text]').trigger('change');
+
+                calculateDiscount();
+
+            })
+
+        })
+
+        
+
+        $('#showtime select').change(function () {
+            var value = $('#showtime select').val();
+
+            ajaxCall('/samples/ticket/ShowtimeDetail/' + value, null, function (result) {
+
+                currShowtime = result || {};
+
+                $('#oriprice input[type=text]').numberVal(result.Price);
+                $('#oriprice input[type=text]').trigger('change');
+
+                calculateDiscount();
+
+            })
+
+        })
+
+        $('#promocode input').keyup(function () {
+            var value = $(this).val();
+            $('#promocode .m-form__help').html('');
+            if (value) {
+
+                $('#promocode .m-form__help').html('Checking...');
+
+                delay(function (e) {
+                    ajaxCall('/samples/ticket/CheckCoupon/' + value, null, function (result) {
+                        
+                    console.log(result);
+                        if (result) {
+
+                            currShowtime = result || {};
+
+                            $('#discount input[type=text]').numberVal(result.Potongan);
+                            $('#discount input[type=text]').trigger('change');
+                            $('#promocode .m-form__help').html('Valid...');
+
+                            currCoupon = result;
+
+                        } else {
+                            currCoupon = {};
+                            $('#discount input[type=text]').numberVal(0);
+                            $('#discount input[type=text]').trigger('change');
+                            $('#promocode .m-form__help').html('Invalid...');
+                        }
+
+                        calculateDiscount();
+
+                    })
+                }, 1000)
+            }
+        });
+
+        function calculateDiscount() {
+            
+            var oriprice = $('#oriprice input[type=hidden]').val() || 0;
+            var discount = $('#discount input[type=hidden]').val() || 0;
+            var price = parseFloat(oriprice) - parseFloat(discount);
+
+            $('#price input[type=text]').numberVal(price);
+            $('#price input[type=text]').trigger('change');
+
+        }
+    </script>
+
+}
+

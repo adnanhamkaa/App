@@ -1,0 +1,178 @@
+﻿@using System.Globalization
+@using App.Web.Utilities.Settings
+@inherits FormFieldRazorPage<DateTime?, DateTimeFieldSetting>
+@{
+    var random = Randomer.Self;
+    var stg = FormFieldSetting;
+    var inputId = $"field-input-{random.Next()}";
+    var valMsg = string.IsNullOrEmpty(stg.InputName) ? null : Html.ValidationMessage(stg.InputName);
+    var hasError = valMsg != null && valMsg.ToString().StripHtmlTags().Trim().Length > 0;
+    var pickerStyle = "datetime";
+    var stringVal = Model.HasValue ? Model.Value.ToString("O") : "";
+
+    if (Model.HasValue && Model < stg.MinDate) { stg.MinDate = Model.Value.Date; }
+
+    var dispVal = "";
+    var culture = new CultureInfo("id-ID");
+    if (stg.Style == DateTimeFieldStyle.DateOnly) {
+        pickerStyle = "date";
+        if (Model.HasValue) {
+            dispVal = Model.Value.ToString("d MMM yyyy", culture).Replace(".", ":");
+        }
+    } else if (stg.Style == DateTimeFieldStyle.TimeOnly) {
+        pickerStyle = "time";
+        if (Model.HasValue) {
+            dispVal = Model.Value.ToString("HH:mm", culture).Replace(".", ":");
+        }
+    } else if (stg.Style == DateTimeFieldStyle.MonthOnly) {
+        pickerStyle = "month";
+        if (Model.HasValue) {
+            dispVal = Model.Value.ToString("MMMM yyyy", culture).Replace(".", ":");
+        }
+    } else if (stg.Style == DateTimeFieldStyle.YearOnly) {
+        pickerStyle = "year";
+        if (Model.HasValue) {
+            dispVal = Model.Value.ToString("yyyy", culture).Replace(".", ":");
+        }
+    } else {
+        if (Model.HasValue) {
+            dispVal = Model.Value.ToString("d MMM yyyy, HH:mm", culture).Replace(".", ":");
+        }
+    }
+}
+
+@(stg.Inline && string.IsNullOrEmpty(stg.InlineContainer) ? "<div class=row input-group col-6  m-form__group >" : "")
+@if (stg.Inline) {
+    <div class="input-group col-6  m-form__group" style="padding-top:0px">
+        <div id="@inputId-inlinebox"></div>
+    </div>
+}
+<div class="form-group @(stg.Inline?"col-6":"") m-form__group  @(hasError ? "has-danger" : "") @stg.CssClass" id="@stg.HtmlId" style="padding-top:0px;width:100%;">
+    @if (!string.IsNullOrWhiteSpace(stg.Label)) {
+        if (stg.Label.Contains("</label>")) {
+
+            @Html.Raw(stg.Label)
+        } else {
+            <label class="form-control-label" for="@inputId">
+                @Html.Raw(stg.Label)
+            </label>
+
+        }
+    }
+    @if (stg.Style == DateTimeFieldStyle.TimeOnly) {
+        <div class="input-group  m-form__group  clock" id="@inputId-box" style="padding-top:0px">
+            <input type="text" class="form-control clock-display" @(stg.Disabled ? "disabled" : "") placeholder="@stg.Placeholder"
+                   value="@Html.Raw(dispVal)" name="" readonly />
+            <input type="hidden" id="@inputId" class="clock-input" value="@Html.Raw(stringVal)" name="@stg.InputName" />
+            <div class="input-group-append">
+                <button class="btn btn-secondary clock-reset" @(stg.Disabled ? "disabled" : "") type="button">
+                    <i class="fa fa-times"></i>
+                </button>
+                <button class="btn btn-secondary clock-toggle" @(stg.Disabled ? "disabled" : "") type="button">
+                    <i class="fa fa-calendar"></i>
+                </button>
+            </div>
+        </div>
+    } else {
+
+        <div class="input-group m-form__group date" id="@inputId-box" style="padding-top:0px">
+            @stg.LeftAddon
+            <input type="text" class="form-control m-input datetime-display" @(stg.Disabled ? "disabled" : "") placeholder="@stg.Placeholder"
+                   value="@Html.Raw(dispVal)" name="" readonly @(stg.MinDate != null ? "data-mindate='" + stg.MinDate.ToString("O") : "" + "'") />
+            <input type="hidden" id="@inputId" class="datetime-input" value="@Html.Raw(stringVal)" name="@stg.InputName" />
+            <div class="input-group-append">
+                @if (stg.ResetButton == true || stg.ResetButton == null && stg.MultipleDate == true) {
+                    <button id="btnRestMultipleDate" class="btn btn-secondary datetime-reset" @(stg.Disabled ? "disabled" : "") type="button">
+                        <i class="fa fa-times"></i>
+                    </button>
+                } else if (stg.ResetButton == true || stg.ResetButton == null) {
+                    <button class="btn btn-secondary datetime-reset" @(stg.Disabled ? "disabled" : "") type="button">
+                        <i class="fa fa-times"></i>
+                    </button>
+                }
+                <button class="btn btn-secondary datetime-toggle" @(stg.Disabled ? "disabled" : "") @(stg.Inline ? "style=display:none" : "") type="button">
+                    <i class="fa fa-calendar"></i>
+                </button>
+            </div>
+        </div>
+    }
+
+
+    @using (Html.Section("scripts")) {
+        <script type="text/javascript">
+
+                var watchChanged = @stg.ChangedWatch.ToString().ToLower();
+                @if (!string.IsNullOrEmpty(stg.InitCallback)) {
+                    
+                }
+                $(document).ready(function() {
+                    window.InitDateTimePicker('#@inputId-box', '@pickerStyle', watchChanged, {
+                        inline: @(stg.Inline.ToString().ToLower()),
+                        id: '@inputId',
+                        inlinebox: '@inputId-inlinebox',
+                        inlinecontainer: '@(string.IsNullOrEmpty(stg.InlineContainer)?"":$"{stg.InlineContainer}")',
+                        useworkdays: @(stg.UseWorkday?.ToString().ToLower()??"true"),
+                        useMultipleDate: @(stg.MultipleDate?.ToString().ToLower()??"false"),
+                        module: '@(stg.WorkdayModule?.ToString()?? ViewContext.RouteData.DataTokens["area"])',
+                        initcb : @(!string.IsNullOrEmpty(stg.InitCallback) ? stg.InitCallback:"null")
+                    }, null, function (elm) {
+
+                        if ('@stg.ReferenceFrom') {
+                            $('@stg.ReferenceFrom input[type="text"]').on('changeDate', function (ev) {
+                                console.log(ev.date);
+                                //if (ev.date && $('@stg.ReferenceFrom input[type="hidden"]').data('changed') !== 'changed' || true) {
+                                $('#@(inputId)-box input[type="text"]').datepicker("setDate",ev.date);//.trigger('changeDate');
+                                //$('#@(inputId)-box input[type="text"]').data("DateTimePicker").date(ev.date);
+                                if (ev.date) {
+                                    $('#@(inputId)-box input[type="hidden"]').val(ev.date.toISOString());
+                                } else {
+                                    $('#@(inputId)-box input[type="hidden"]').val('');
+                                }
+                                //$('#@(inputId)-box input[type="hidden"]').trigger('change');
+                                //}
+                            })
+                        }
+                    })
+                    });
+        </script>
+
+        if (!string.IsNullOrEmpty(stg.ReferenceFrom)) {
+
+            <script>
+                function @(inputId.Replace("-", ""))ref(elm) {
+                    $('@stg.ReferenceFrom input[type="text"]').on('changeDate', function (ev) {
+                        debugger;
+                        //if (ev.date && $('@stg.ReferenceFrom input[type="hidden"]').data('changed') !== 'changed' || true) {
+                        $('#@(inputId)-box input[type="text"]').datepicker("setDate", ev.date);//.trigger('changeDate');
+                        //$('#@(inputId)-box input[type="text"]').data("DateTimePicker").date(ev.date);
+                        if (ev.date) {
+                            $('#@(inputId)-box input[type="hidden"]').val(ev.date.toISOString());
+                        } else {
+                            $('#@(inputId)-box input[type="hidden"]').val('');
+                        }
+                        //$('#@(inputId)-box input[type="hidden"]').trigger('change');
+                        //}
+                    })
+                }
+
+            </script>
+
+        }
+
+    }
+
+    @if (hasError) {
+        <div class="form-control-feedback"  style="width: 100%;float:left;color:#f4516c;padding-left:20%">
+            @valMsg
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(stg.HelpText)) {
+        <span class="m-form__help">
+            @Html.Raw(stg.HelpText)
+        </span>
+    }
+</div>
+
+
+@(stg.Inline && string.IsNullOrEmpty(stg.InlineContainer) ? "</div>" : "")

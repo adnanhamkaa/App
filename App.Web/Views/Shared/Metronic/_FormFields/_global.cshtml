@@ -1,0 +1,15 @@
+﻿@using App.Web.Utilities
+@model FormFieldGlobalViewModel
+@{
+    var tpls = new[] {
+        $"~/Views/Shared/Metronic/_FormFields/custom/_{Model.FormFieldSetting.TemplateId}.cshtml"
+    };
+    var tpl = tpls.FirstOrDefault(x => File.Exists(Server.MapPath(x)));
+    if (string.IsNullOrWhiteSpace(tpl)) {
+        throw new InvalidOperationException($"Can't find form field template for '{Model.FormFieldSetting.GetType()}' " +
+                                            $"with template id '{Model.FormFieldSetting.TemplateId}'.");
+    }
+}
+@Html.PartialFor(tpl, x => x.Model, "", false, new ViewDataDictionary {
+    [FormFieldGlobalViewModel.FORM_FIELD_SETTING_VDD_KEY] = Model.FormFieldSetting
+})

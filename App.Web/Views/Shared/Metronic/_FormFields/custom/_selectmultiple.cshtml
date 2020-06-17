@@ -1,0 +1,109 @@
+﻿@using App.Web.Utilities.Settings
+
+@using App.Web.Models
+
+@inherits FormFieldRazorPage<IEnumerable<KeyValue>, SelectMultipleSetting>
+@{
+    var random = Randomer.Self;
+    var stg = FormFieldSetting;
+    var inputId = $"field-input-{random.Next()}";
+    var valMsg = string.IsNullOrEmpty(stg.InputName) ? null : Html.ValidationMessage(stg.InputName);
+    var hasError = valMsg != null && valMsg.ToString().StripHtmlTags().Trim().Length > 0;
+}
+<div class="form-group  m-form__group @(hasError ? "has-danger" : "") @stg.CssClass" id="@stg.HtmlId">
+    @if (!string.IsNullOrWhiteSpace(stg.Label)) {
+        if (stg.Label.Contains("</label>")) {
+
+            @Html.Raw(stg.Label)
+        } else {
+            <label class="form-control-label" for="@inputId">
+                @Html.Raw(stg.Label)
+            </label>
+
+        }
+    }
+    <select class="form-control" multiple="" name="@stg.InputName" @(stg.Disabled ? "readonly" : "") id="@inputId">
+        @if (stg.AddEmptyOption && !stg.Select2) {
+            <option value="" @(stg.Disabled ? "disabled" : "") @(Model == null ? "selected" : "")>@(stg.EmptyOptionLabel ?? stg.Placeholder)</option>
+        }
+        @if (stg.Options != null) {
+            foreach (var opt in stg.Options) {
+                var val = stg.OptionValueGetter.Invoke(opt);
+                var lab = stg.OptionLabelGetter.Invoke(opt);
+
+                <option value="@Html.Encode(val)" @(stg.Disabled ? "disabled" : "") @(Model?.Any(t => t.Key == Html.Encode(val)) == true && stg.Select2 ? "selected" : "")>@lab</option>
+
+
+            }
+        } else {
+            if (Model != null && stg.Select2) {
+                foreach (var item in Model) {
+
+                    <option value="@item.Key" selected>@(item.Value ?? "")</option>
+                }
+            }
+        }
+    </select>
+
+    @if (hasError) {
+        <div class="form-control-feedback" style="width: 100%;float:left;color:#f4516c;padding-left:20%">
+            @valMsg
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(stg.HelpText)) {
+        <span class="m-form__help">
+            @Html.Raw(stg.HelpText)
+        </span>
+    }
+</div>
+
+@using (Html.Section("scripts")) {
+    if (!string.IsNullOrEmpty(stg.ReferenceFrom)) {
+        <script>
+            $('@stg.ReferenceFrom select').on('change', function () {
+                if($('#@inputId').data('changed') !== 'changed')
+                    $('#@inputId').val($(this).val());
+            })
+        </script>
+    }
+
+    if (stg.Select2 && !stg.Select2Ajax && (stg.Select2Url ?? "") == "") {
+        <script>
+
+
+            $(document).ready(function () {
+
+                //debugger;
+                $('#@inputId').val([@Html.Raw(Model == null ? "": string.Join(",",Model.Select(t => "\""+t.Key+"\"" ).ToArray()))]);
+                $('#@inputId').trigger('change');
+
+                if (@stg.Disabled.ToString().ToLower()) {
+                    $('#@inputId').select2({
+                        placeholder: '@stg.EmptyOptionLabel',
+                        width: '80%',
+                        closeOnSelect: false
+                    }).enable(false);
+                }
+                else {
+                    $('#@inputId').select2({
+                        placeholder: '@stg.EmptyOptionLabel',
+                        width: '80%',
+                        closeOnSelect: false
+                    })
+
+
+                }
+
+            })
+        </script>
+    }
+
+    @*if (stg.ChangedWatch) {
+            <script>
+                $('#@inputId').on('change', function () {
+                    $(this).attr('data-changed', 'changed');
+                });
+            </script>
+        }*@
+}
